@@ -69,3 +69,14 @@ void ui_feedback_indicate_battery(bool low)
 	led_set(LED_POWER_STAT_O, low);  // low(true)면 켜짐(true)
 	led_set(LED_POWER_STAT_W, !low); // low(true)면 꺼짐(false)
 }
+
+static void ir_set(bool state)
+{
+    state ? rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_RED) : rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+}
+
+
+void ui_feedback_on_obstacle(uint16_t detected)
+{
+	ir_set(detected);
+}

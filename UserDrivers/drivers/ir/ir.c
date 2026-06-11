@@ -9,9 +9,14 @@
 
 #include "ir.h"
 #include "color.h"
-
+#include "led.h"
 
 extern ADC_HandleTypeDef hadc1; // from main.c
+
+void ir_init(void)
+{
+	led_on(LED_W_CONTROL);
+}
 
 uint16_t ir_read_adc(void)
 {

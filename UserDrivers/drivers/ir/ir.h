@@ -10,6 +10,7 @@
 
 #include "def.h"
 
+void ir_init(void);
 uint16_t ir_read_adc(void);
 
 #endif /* IR_IR_H_ */

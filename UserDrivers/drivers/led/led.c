@@ -22,7 +22,7 @@ static const led_ch_cfg_t led_cfg[LED_CH_COUNT] =
 {
 	[LED_POWER_STAT_W]	= { GPIOC, GPIO_PIN_4,  true, false },	//debug led		: low active
 	[LED_POWER_STAT_O] 	= { GPIOC, GPIO_PIN_5,  true, false },	//debug led		: low active
-	[LED_W_CONTROL]		= { GPIOA, GPIO_PIN_7, false, false },		//npn-tr base	: high active
+	[LED_W_CONTROL]		= { GPIOA, GPIO_PIN_7, false, true  },	//npn-tr base	: high active
 };
 
 

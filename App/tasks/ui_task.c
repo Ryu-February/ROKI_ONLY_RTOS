@@ -21,7 +21,7 @@ void rgb_off_timer_callback(void *argument)
 {
 	(void)argument;
 
-	ui_msg_t msg = { .type = UI_EVT_RGB_TIMER_OFF };
+	ui_msg_t msg = { .type = UI_EVT_RGB_TIMEOUT };
 
 	osMessageQueuePut(ui_queue, &msg, 0, osWaitForever);
 }
@@ -54,8 +54,11 @@ void ui_task(void *argument)
 			case UI_EVT_BAT_INDICATE:
 				ui_feedback_indicate_battery(msg.bat_low);
 				break;
-			case UI_EVT_RGB_TIMER_OFF:
+			case UI_EVT_RGB_TIMEOUT:
 				ui_feedback_btn_press_timeout();
+				break;
+			case UI_EVT_IR_DETECTED:
+				ui_feedback_on_obstacle(msg.ir_detected);
 				break;
 			default:
 				break;

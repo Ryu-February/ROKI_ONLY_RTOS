@@ -15,7 +15,8 @@ typedef enum
 {
 	UI_EVT_BTN_PRESSED,
 	UI_EVT_BAT_INDICATE,
-	UI_EVT_RGB_TIMER_OFF,
+	UI_EVT_RGB_TIMEOUT,
+	UI_EVT_IR_DETECTED,
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -24,7 +25,7 @@ typedef struct
 	ui_evt_type_t 	type;
 	btn_id_t 		btn;
 	uint16_t		vbat;
-	uint16_t		ir;
+	bool			ir_detected;
 	bool			bat_low;
 }ui_msg_t;
 

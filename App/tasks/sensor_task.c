@@ -10,11 +10,19 @@
 #include "msg_types.h"
 #include "utils.h"
 
+#include "ir.h"
 #include "vbat_adc.h"
 #include "battery_monitor.h"
 
+#include "ir_monitor.h"
+
 
 #define BATTERY_EVAL_DIV	100U
+#define IR_EVAL_DIV 5
+
+
+
+
 
 static void publish_battery(void)
 {
@@ -33,6 +41,20 @@ static void publish_battery(void)
 	osMessageQueuePut(ui_queue, &vbat_msg, 0, 0);
 }
 
+static void publish_ir(void)
+{
+	uint16_t adc = ir_read_adc();
+	ir_result_t res;
+
+	ir_monitor_update(adc, &res);
+
+	ui_msg_t ir_msg;
+	ir_msg.type = UI_EVT_IR_DETECTED;
+	ir_msg.ir_detected = res.ir_detected;
+
+	osMessageQueuePut(ui_queue, &ir_msg, 0, 0);
+}
+
 
 
 
@@ -40,11 +62,20 @@ void sensor_task(void *argument)
 {
 	(void)argument;
 
+	ir_init();
+
 	uint32_t tick 		= tick_now();
 	uint32_t bat_div	= 0;
+	uint32_t ir_div		= 0;
 
 	for (;;)
 	{
+		if (++ir_div > IR_EVAL_DIV)
+		{
+			ir_div = 0;
+			publish_ir();
+		}
+
 		if (++bat_div > BATTERY_EVAL_DIV)
 		{
 			bat_div = 0;

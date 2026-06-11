@@ -18,4 +18,6 @@ void ui_feedback_btn_press_start(btn_id_t btn);
 void ui_feedback_btn_press_timeout(void);
 void ui_feedback_indicate_battery(bool low);
 
+void ui_feedback_on_obstacle(uint16_t detected);
+
 #endif /* SERVICES_UI_FEEDBACK_UI_FEEDBACK_H_ */
