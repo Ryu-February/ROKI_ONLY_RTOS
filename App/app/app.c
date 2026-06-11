@@ -23,8 +23,15 @@ const static task_init_t s_task_table[] =
 
 #define NUM_STACKS (sizeof(s_task_table) / sizeof(s_task_table[0]))
 
+
+osMessageQueueId_t ui_queue;
+
+
 void app_init(void)
 {
+	ui_queue = osMessageQueueNew(8, sizeof(ui_msg_t), NULL);
+
+
 	for (uint32_t i = 0; i < NUM_STACKS; i++)
 	{
 		osThreadAttr_t attr =

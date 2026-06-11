@@ -10,6 +10,7 @@
 
 
 #include "utils.h"
+#include "msg_types.h"
 
 typedef struct
 {

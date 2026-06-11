@@ -11,6 +11,9 @@
 
 #include "utils.h"
 
+#include "rgb.h"
+#include "buzzer.h"
+
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim6;
@@ -29,12 +32,12 @@ void bsp_isr_tim_start(void)
 
 void bsp_isr_tim4_callback(void) /*30us timer - stepper motor timer*/
 {
-
+	rgb_tick();
 }
 
 void bsp_isr_tim6_callback(void)
 {
-
+	buzzer_update_1ms();
 }
 
 void bsp_isr_tim7_callback(void) /*50us timer - rgb led timer*/
