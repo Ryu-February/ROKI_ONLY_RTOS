@@ -23,6 +23,9 @@ typedef struct
 {
 	ui_evt_type_t 	type;
 	btn_id_t 		btn;
+	uint16_t		vbat;
+	uint16_t		ir;
+	bool			bat_low;
 }ui_msg_t;
 
 

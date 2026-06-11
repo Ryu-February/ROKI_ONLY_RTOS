@@ -8,15 +8,14 @@
 
 #include "app.h"
 
-#include "ui_task.h"
-#include "input_task.h"
+
 
 
 const static task_init_t s_task_table[] =
 {
 		{ ui_task	, 	"ui_task", 		128 * 4, 	osPriorityLow 			},
 		{ input_task, 	"input_task", 	128 * 4, 	osPriorityNormal 		},
-//		{ sensor_task, 	"sensor_task", 	128 * 4, 	osPriorityBelowNormal 	},
+		{ sensor_task, 	"sensor_task", 	128 * 4, 	osPriorityBelowNormal 	},
 //		{ control_task, "control_task", 128 * 4, 	osPriorityAboveNormal	},
 };
 

@@ -52,6 +52,7 @@ void ui_task(void *argument)
 				osTimerStart(rgb_off_timer_id, 500);
 				break;
 			case UI_EVT_BAT_INDICATE:
+				ui_feedback_indicate_battery(msg.bat_low);
 				break;
 			case UI_EVT_RGB_TIMER_OFF:
 				ui_feedback_btn_press_timeout();

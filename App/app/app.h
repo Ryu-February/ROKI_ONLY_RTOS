@@ -12,6 +12,10 @@
 #include "utils.h"
 #include "msg_types.h"
 
+#include "ui_task.h"
+#include "input_task.h"
+#include "sensor_task.h"
+
 typedef struct
 {
 	osThreadFunc_t 	func;

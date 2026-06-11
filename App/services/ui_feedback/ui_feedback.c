@@ -56,3 +56,16 @@ void ui_feedback_btn_press_timeout(void)
 {
 	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
 }
+
+
+static void led_set(led_ch_t ch, bool state)
+{
+    state ? led_on(ch) : led_off(ch);
+}
+
+void ui_feedback_indicate_battery(bool low)
+{
+	// low 상태에 따라 각 LED의 ON/OFF 상태를 직접 주입
+	led_set(LED_POWER_STAT_O, low);  // low(true)면 켜짐(true)
+	led_set(LED_POWER_STAT_W, !low); // low(true)면 꺼짐(false)
+}
