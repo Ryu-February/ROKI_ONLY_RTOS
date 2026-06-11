@@ -14,7 +14,7 @@
 #include <stdbool.h>
 
 #include <stdarg.h>
-
+#include <string.h>
 
 #include "main.h"
 #include "cmsis_os2.h"

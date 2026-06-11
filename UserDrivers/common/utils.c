@@ -6,3 +6,19 @@
  */
 
 
+#include "utils.h"
+
+
+
+
+
+uint32_t tick_now(void)
+{
+	return osKernelGetTickCount();
+}
+
+
+void sleep_until(uint32_t tick)
+{
+	osDelayUntil(tick);
+}
