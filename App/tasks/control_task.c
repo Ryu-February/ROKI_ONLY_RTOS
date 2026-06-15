@@ -9,12 +9,9 @@
 
 
 #include "msg_types.h"
-
 #include "stepper.h"
-
 #include "sensor_state.h"
 
-bool ir3 = false;
 
 void control_task(void *argument)
 {

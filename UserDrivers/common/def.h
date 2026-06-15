@@ -15,6 +15,7 @@
 
 #include <stdarg.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "main.h"
 #include "cmsis_os2.h"

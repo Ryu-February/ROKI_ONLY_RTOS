@@ -15,12 +15,18 @@
 #include "buzzer.h"
 #include "stepper.h"
 
+#define UART_RX_DMA_BUFSZ	128
+
 
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim6;
 extern TIM_HandleTypeDef htim7;
 
+extern UART_HandleTypeDef huart3;
+
+
+uint8_t rx_dma_buf[UART_RX_DMA_BUFSZ];
 
 void bsp_isr_tim_start(void)
 {
@@ -29,6 +35,8 @@ void bsp_isr_tim_start(void)
 
 	HAL_TIM_Base_Start_IT(&htim6); // 1ms timer
 	HAL_TIM_Base_Start_IT(&htim7); // rgb led timer
+
+	HAL_UARTEx_ReceiveToIdle_DMA(&huart3, rx_dma_buf, UART_RX_DMA_BUFSZ);
 }
 
 
@@ -46,3 +54,46 @@ void bsp_isr_tim7_callback(void) /*50us timer - rgb led timer*/
 {
 	rgb_tick();
 }
+
+static volatile uint16_t rx_last_pos = 0;
+volatile uint32_t cb_hit_count = 0;
+
+extern osMessageQueueId_t rx_queue;
+
+void bsp_usart3_gpdma_ch1_callback(uint16_t size)
+{
+	cb_hit_count++;
+
+	if (size == rx_last_pos)
+	{
+		return;
+	}
+
+	if (size > rx_last_pos)
+	{
+		for (uint16_t i = rx_last_pos; i < size; i++)
+		{
+			osMessageQueuePut(rx_queue, &rx_dma_buf[i], 0, 0);
+		}
+	}
+	else
+	{
+		for (uint16_t i = rx_last_pos; i < UART_RX_DMA_BUFSZ; i++)
+		{
+			osMessageQueuePut(rx_queue, &rx_dma_buf[i], 0, 0);
+		}
+		for (uint16_t i = 0; i < size; i++)
+		{
+			osMessageQueuePut(rx_queue, &rx_dma_buf[i], 0, 0);
+		}
+	}
+	rx_last_pos = size;
+}
+
+
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size)
+{
+	if (huart->Instance == USART3)
+		bsp_usart3_gpdma_ch1_callback(size);
+}
+

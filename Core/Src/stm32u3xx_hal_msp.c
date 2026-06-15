@@ -21,7 +21,11 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
-
+#include "linked_list.h"
+extern DMA_HandleTypeDef handle_GPDMA1_Channel0;
+extern DMA_HandleTypeDef handle_GPDMA1_Channel1;
+extern DMA_QListTypeDef  RxQueue;
+extern DMA_QListTypeDef  TxQueue;
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -564,8 +568,19 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
     GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+    /* USART3 interrupt Init */
+    HAL_NVIC_SetPriority(USART3_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(USART3_IRQn);
     /* USER CODE BEGIN USART3_MspInit 1 */
+    /* 링크드리스트 큐를 빌드해서 채널에 연결해야 GPDMA가 실제로 동작한다.
+     * 이게 빠지면 채널 큐가 비어 전송이 안 되고 콜백도 안 뜬다. */
+    if (MX_TxQueue_Config() != HAL_OK)                                    { Error_Handler(); }
+    if (HAL_DMAEx_List_LinkQ(&handle_GPDMA1_Channel0, &TxQueue) != HAL_OK) { Error_Handler(); }
+    __HAL_LINKDMA(huart, hdmatx, handle_GPDMA1_Channel0);
 
+    if (MX_RxQueue_Config() != HAL_OK)                                    { Error_Handler(); }
+    if (HAL_DMAEx_List_LinkQ(&handle_GPDMA1_Channel1, &RxQueue) != HAL_OK) { Error_Handler(); }
+    __HAL_LINKDMA(huart, hdmarx, handle_GPDMA1_Channel1);
     /* USER CODE END USART3_MspInit 1 */
 
   }
@@ -594,6 +609,8 @@ void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
     */
     HAL_GPIO_DeInit(GPIOC, GPIO_PIN_10|GPIO_PIN_11);
 
+    /* USART3 interrupt DeInit */
+    HAL_NVIC_DisableIRQ(USART3_IRQn);
     /* USER CODE BEGIN USART3_MspDeInit 1 */
 
     /* USER CODE END USART3_MspDeInit 1 */
