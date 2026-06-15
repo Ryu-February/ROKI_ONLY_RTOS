@@ -41,6 +41,21 @@ static void buzzer_by_button(btn_id_t id)
 	}
 }
 
+static color_t color_by_card(color_mode_t cmd)
+{
+    switch (cmd)
+    {
+        case MODE_FORWARD:     return COLOR_GREEN;
+        case MODE_BACKWARD:    return COLOR_RED;
+        case MODE_LEFT:        return COLOR_BLUE;
+        case MODE_RIGHT:       return COLOR_YELLOW;
+        case MODE_REPEAT_ONCE: return COLOR_PURPLE;
+        case MODE_REPEAT_TWICE:return COLOR_PINK;
+        case MODE_REPEAT_THIRD:return COLOR_SKY_BLUE;
+        default:               return COLOR_BLACK;
+    }
+}
+
 
 void ui_feedback_btn_press_start(btn_id_t btn)
 {
@@ -80,3 +95,11 @@ void ui_feedback_on_obstacle(uint16_t detected)
 {
 	ir_set(detected);
 }
+
+
+void ui_feedback_indicate_card(color_mode_t cmd)
+{
+	rgb_set_color(RGB_ZONE_V_SHAPE, color_by_card(cmd));
+	buzzer_play_dir_click_soft();
+}
+

@@ -23,7 +23,7 @@
 
 #define BATTERY_EVAL_DIV	100U
 #define IR_EVAL_DIV 		5U
-#define COLOR_EVAL_DIV		2U		//20ms * 50 = 1s (color_sense가 1초 호출 가정)
+#define COLOR_EVAL_DIV		2U		//20ms * 2 = 40ms (color_sensor measurement time: 35ms )
 
 
 static color_sense_t s_color;		//카드 명령 누적 상태
