@@ -32,7 +32,7 @@ void bsp_isr_tim_start(void)
 }
 
 
-void bsp_isr_tim4_callback(void) /*30us timer - stepper motor timer*/
+void bsp_isr_tim4_callback(void) /*300us timer - stepper motor timer*/
 {
 	step_tick_isr();
 }

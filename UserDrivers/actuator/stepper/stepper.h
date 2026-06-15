@@ -3,14 +3,12 @@
  *
  *  Created on: Sep 10, 2025
  *      Author: RCY
+ *  	15BY25-729 + A3916, STM32U375
  */
-
 #ifndef ACTUATOR_STEPPER_STEPPER_H_
 #define ACTUATOR_STEPPER_STEPPER_H_
 
 #include "def.h"
-//#include "color.h"
-
 
 /* ================= STM32U375RGT6 Pin Map =================
  * 15BY25-729 + A3916
@@ -44,28 +42,25 @@
 #define R_IN4_PORT GPIOC
 #define R_IN4_PIN  GPIO_PIN_6
 
+/* Motor driver sleep (nSLEEP) */
+#define MOTOR_SLP_PORT GPIOA
+#define MOTOR_SLP_PIN  GPIO_PIN_12
+
+/* Step rate. TIM4: PSC=95 -> 1us/tick, ARR = period_us - 1. */
+#define STEP_DEFAULT_PERIOD_US 500U   /* legacy base speed */
+#define STEP_MIN_PERIOD_US     30U   /* cap top speed (anti step-loss) */
+
 #define SAFE_MAX_RPM 1200
-#define MAX_SPEED 100
-#define MIN_SPEED 0
 
-// Step period timer runs on a 1us tick (TIM4: PSC=95 -> 1us/count).
-// ARR = period_ticks - 1, so 1 tick == 1us. This is the base run speed.
-#define STEP_DEFAULT_PERIOD_TICKS 300U   // 300us per microstep (legacy base speed)
-#define STEP_MIN_PERIOD_TICKS     30U    // lower bound to cap the ISR rate
-
-
-// Select step mode (FULL / HALF / MICRO)
-#define _STEP_MODE_FULL 0
-#define _STEP_MODE_HALF 1
+/* ---- Step mode ---- */
+#define _STEP_MODE_FULL  0
+#define _STEP_MODE_HALF  1
 #define _STEP_MODE_MICRO 2
-
-
 #ifndef _USE_STEP_MODE
 #define _USE_STEP_MODE _STEP_MODE_MICRO
 #endif
 
-
-#if (_USE_STEP_MODE == _STEP_MODE_HALF)
+#if   (_USE_STEP_MODE == _STEP_MODE_HALF)
 #define STEP_MASK 0x07
 #define STEP_PER_REV 40
 #define STEP_TABLE_SIZE 8
@@ -81,86 +76,62 @@
 #error "_USE_STEP_MODE invalid"
 #endif
 
-
-// ---------------- Types ----------------
-// ISR‑safe POD struct for one motor
+/* ---- Types ---- */
 typedef struct
 {
-	GPIO_TypeDef* in1p; 	uint16_t in1b; // bit mask (e.g., GPIO_PIN_0)
-	GPIO_TypeDef* in2p; 	uint16_t in2b;
-	GPIO_TypeDef* in3p; 	uint16_t in3b;
-	GPIO_TypeDef* in4p; 	uint16_t in4b;
+    GPIO_TypeDef *in1_port;  uint16_t in1_pin;
+    GPIO_TypeDef *in2_port;  uint16_t in2_pin;
+    GPIO_TypeDef *in3_port;  uint16_t in3_pin;
+    GPIO_TypeDef *in4_port;  uint16_t in4_pin;
 
-
-	volatile uint16_t 	step_idx; // 0..STEP_MASK (wraps via mask)
-	volatile uint32_t 	period_ticks; // tick source = TIMx (1us or similar)
-	volatile uint32_t 	prev_tick; // last index advance time
-	volatile uint32_t 	odometry_steps; // for telemetry (atomic on M4)
-			 int8_t 	dir_sign; // +1 / -1 (compile to single add)
-} StepLL;
+    volatile uint16_t step_idx;        /* 0..STEP_MASK */
+    volatile uint32_t odometry_steps;  /* telemetry (32b read atomic on M4) */
+    int8_t            dir_sign;        /* +1 / -1 */
+} stepper_motor_t;
 
 typedef enum
 {
-	HOLD_OFF 	= 0,	//coils off(freewheel)
-	HOLD_BRAKE	= 1		//coils energized(hold torque)
-}hold_mode_t;
+    DRV_COAST = 0,   /* coils off, driver asleep   */
+    DRV_RUN,         /* stepping, driver awake     */
+    DRV_BRAKE        /* coils energized, awake     */
+} drv_state_t;
 
-
-// High‑level operations kept for API compatibility
-typedef enum {
-	OP_NONE = 0,
-	OP_FORWARD,
-	OP_REVERSE,
-	OP_TURN_LEFT,
-	OP_TURN_RIGHT,
-	OP_STOP
+typedef enum
+{
+    OP_NONE = 0,
+    OP_FORWARD,
+    OP_REVERSE,
+    OP_TURN_LEFT,
+    OP_TURN_RIGHT,
+    OP_STOP
 } StepOperation;
 
-
-// ---------------- Public API ----------------
-// 1) Init & wiring
+/* ---- API ---- */
 void step_init_all(void);
-void step_idx_init(void);
-void step_idx_save(void);
-void step_idx_show(void);
+void step_tick_isr(void);                 /* call from TIM4 update ISR */
 
-void step_idx_mark_save_needed(void);
-void step_idx_flush_service(void);
+void step_set_dir(int8_t left_sign, int8_t right_sign);  /* direction only */
+void step_set_period_us(uint32_t period_us);             /* shared step rate */
 
-// 2) Real‑time tick: call from your 10us ISR (or whichever period you run the motor ISR)
-void step_tick_isr(void);
-
-
-// 3) Control from main thread (non‑ISR)
-void step_set_period_ticks(uint32_t left_ticks, uint32_t right_ticks); // unit = tick source period
-void step_set_dir(int8_t left_sign, int8_t right_sign); // +1 or -1
-void step_stop(void); // brake both
-void step_coast_stop(void);
+void step_run(void);
+void step_brake(void);
+void step_coast(void);
+void step_stop(void);        /* = brake */
+void step_coast_stop(void);  /* = coast */
 bool step_is_running(void);
-void step_set_hold(hold_mode_t mode);
 
+void step_drive(StepOperation op);
 
-// 4) Telemetry
+/* telemetry */
 uint32_t get_executed_steps(void);
 void show_executed_steps(void);
 void odometry_steps_init(void);
 
-
-// 5) Compatibility helpers (keep your existing higher‑level code working)
-void step_drive(StepOperation op);
-void step_drive_ratio(uint16_t left_ticks, uint16_t right_ticks);
-
-
-// Mappings you already used
-//StepOperation 	mode_to_step(color_mode_t mode);
-//uint16_t 		mode_to_step_count(color_mode_t mode);
-//uint16_t 		mode_to_left_period(color_mode_t mode);
-//uint16_t 		mode_to_right_period(color_mode_t mode);
-
-
-// Optional util if you still convert from RPM/PWM in main thread
-uint32_t rpm_to_period_ticks(uint16_t rpm, uint32_t tick_hz);
-uint32_t pwm_to_rpm(uint8_t pwm);
-
+/* step index persistence */
+void step_idx_init(void);
+void step_idx_save(void);
+void step_idx_show(void);
+void step_idx_mark_save_needed(void);
+void step_idx_flush_service(void);
 
 #endif /* ACTUATOR_STEPPER_STEPPER_H_ */
