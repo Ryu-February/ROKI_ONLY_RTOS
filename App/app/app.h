@@ -15,6 +15,7 @@
 #include "ui_task.h"
 #include "input_task.h"
 #include "sensor_task.h"
+#include "control_task.h"
 
 typedef struct
 {

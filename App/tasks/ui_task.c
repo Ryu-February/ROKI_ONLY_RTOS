@@ -13,6 +13,8 @@
 
 #include "ui_feedback.h"
 
+#include "sensor_state.h"
+
 static osTimerId_t rgb_off_timer_id;
 
 
@@ -52,13 +54,13 @@ void ui_task(void *argument)
 				osTimerStart(rgb_off_timer_id, 500);
 				break;
 			case UI_EVT_BAT_INDICATE:
-				ui_feedback_indicate_battery(msg.bat_low);
+				ui_feedback_indicate_battery(sensor_state_get_vbat_low());
 				break;
 			case UI_EVT_RGB_TIMEOUT:
 				ui_feedback_btn_press_timeout();
 				break;
 			case UI_EVT_IR_DETECTED:
-				ui_feedback_on_obstacle(msg.ir_detected);
+				ui_feedback_on_obstacle(sensor_state_get_ir());
 				break;
 			default:
 				break;

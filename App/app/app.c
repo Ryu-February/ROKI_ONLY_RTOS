@@ -16,7 +16,7 @@ const static task_init_t s_task_table[] =
 		{ ui_task	, 	"ui_task", 		128 * 4, 	osPriorityLow 			},
 		{ input_task, 	"input_task", 	128 * 4, 	osPriorityNormal 		},
 		{ sensor_task, 	"sensor_task", 	128 * 4, 	osPriorityBelowNormal 	},
-//		{ control_task, "control_task", 128 * 4, 	osPriorityAboveNormal	},
+		{ control_task, "control_task", 128 * 4, 	osPriorityAboveNormal	},
 };
 
 
@@ -24,12 +24,12 @@ const static task_init_t s_task_table[] =
 
 
 osMessageQueueId_t ui_queue;
-
+osMessageQueueId_t ctrl_queue;
 
 void app_init(void)
 {
 	ui_queue = osMessageQueueNew(8, sizeof(ui_msg_t), NULL);
-
+	ctrl_queue = osMessageQueueNew(8, sizeof(ctrl_msg_t), NULL);
 
 	for (uint32_t i = 0; i < NUM_STACKS; i++)
 	{

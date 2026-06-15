@@ -15,6 +15,7 @@
 #include "battery_monitor.h"
 
 #include "ir_monitor.h"
+#include "sensor_state.h"
 
 
 #define BATTERY_EVAL_DIV	100U
@@ -22,7 +23,27 @@
 
 
 
+static void sensor_dispatch(const sensor_evt_t *e)
+{
+	switch (e->kind)
+	{
+		case SENS_IR:
+		{
+			ui_msg_t 	u = { .type = UI_EVT_IR_DETECTED, .ir_detected = e->ir_detected };
+			ctrl_msg_t	c = { .ir_detected = e->ir_detected };
 
+			osMessageQueuePut(ui_queue,   &u, 0, 0);
+			osMessageQueuePut(ctrl_queue, &c, 0, 0);
+			break;
+		}
+		case SENS_BAT:
+		{
+			ui_msg_t 	u = { .type = UI_EVT_BAT_INDICATE, .bat_low = e->bat_low };
+			osMessageQueuePut(ui_queue, &u, 0, 0);
+			break;
+		}
+	}
+}
 
 static void publish_battery(void)
 {
@@ -34,12 +55,12 @@ static void publish_battery(void)
 
 	battery_monitor_update(&s_batt, adc, running, &res);
 
-	ui_msg_t vbat_msg;
-	vbat_msg.type = UI_EVT_BAT_INDICATE;
-	vbat_msg.bat_low = res.low;
-
-	osMessageQueuePut(ui_queue, &vbat_msg, 0, 0);
+	if (sensor_state_update_bat(res.low, res.pct))
+	{
+		osMessageQueuePut(ui_queue, &(ui_msg_t){ .type = UI_EVT_BAT_INDICATE }, 0, 0);
+	}
 }
+
 
 static void publish_ir(void)
 {
@@ -48,14 +69,11 @@ static void publish_ir(void)
 
 	ir_monitor_update(adc, &res);
 
-	ui_msg_t ir_msg;
-	ir_msg.type = UI_EVT_IR_DETECTED;
-	ir_msg.ir_detected = res.ir_detected;
-
-	osMessageQueuePut(ui_queue, &ir_msg, 0, 0);
+	if (sensor_state_update_ir(res.ir_detected))
+	{
+		osMessageQueuePut(ui_queue, &(ui_msg_t){ .type = UI_EVT_IR_DETECTED}, 0, 0);
+	}
 }
-
-
 
 
 void sensor_task(void *argument)
@@ -70,13 +88,13 @@ void sensor_task(void *argument)
 
 	for (;;)
 	{
-		if (++ir_div > IR_EVAL_DIV)
+		if (++ir_div > IR_EVAL_DIV)			//100ms
 		{
 			ir_div = 0;
 			publish_ir();
 		}
 
-		if (++bat_div > BATTERY_EVAL_DIV)
+		if (++bat_div > BATTERY_EVAL_DIV)	//2초
 		{
 			bat_div = 0;
 			publish_battery();

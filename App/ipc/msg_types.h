@@ -29,8 +29,30 @@ typedef struct
 	bool			bat_low;
 }ui_msg_t;
 
+typedef enum
+{
+	SENS_IR,
+	SENS_BAT
+}sensor_kind_t;
+
+typedef struct
+{
+	sensor_kind_t kind;
+	union
+	{
+		bool ir_detected;
+		bool bat_low;
+	};
+}sensor_evt_t;
+
+
+typedef struct
+{
+	bool			ir_detected;
+}ctrl_msg_t;
 
 extern osMessageQueueId_t ui_queue;
+extern osMessageQueueId_t ctrl_queue;
 
 
 #endif /* IPC_MSG_TYPES_H_ */
