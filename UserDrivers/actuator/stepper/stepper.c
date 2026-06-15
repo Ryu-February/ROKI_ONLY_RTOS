@@ -214,9 +214,6 @@ static inline int8_t sgn3(int8_t s)
 
 /* ================= ISR ================= */
 /* TIM4 update fires once per microstep (ARR = period_us-1). */
-uint32_t time = 0;
-uint32_t prev = 0;
-uint32_t diff = 0;
 void step_tick_isr(void)
 {
     if (g_state != DRV_RUN) return;   /* brake/coast: hold, no advance */
@@ -228,15 +225,6 @@ void step_tick_isr(void)
 
     apply_step(&left);
     apply_step(&right);
-    time = TIM2->CNT;
-    if (time != prev)
-    {
-    	time = TIM2->CNT;
-
-    	diff = time - prev;
-		prev = time;
-    }
-
 }
 
 /* ================= control ================= */

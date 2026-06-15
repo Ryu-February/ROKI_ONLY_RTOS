@@ -10,6 +10,7 @@
 
 
 #include "btn.h"
+#include "card_cmd.h"
 
 typedef enum
 {
@@ -17,6 +18,7 @@ typedef enum
 	UI_EVT_BAT_INDICATE,
 	UI_EVT_RGB_TIMEOUT,
 	UI_EVT_IR_DETECTED,
+	UI_EVT_CARD_INSERTED,
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -27,6 +29,8 @@ typedef struct
 	uint16_t		vbat;
 	bool			ir_detected;
 	bool			bat_low;
+	color_mode_t	card;		// UI_EVT_CARD_INSERTED 시 확정된 명령
+	uint8_t			card_count;	// 누적 카드 개수
 }ui_msg_t;
 
 typedef enum

@@ -17,9 +17,16 @@
 #include "ir_monitor.h"
 #include "sensor_state.h"
 
+#include "color.h"
+#include "color_sense.h"
+
 
 #define BATTERY_EVAL_DIV	100U
-#define IR_EVAL_DIV 5
+#define IR_EVAL_DIV 		5U
+#define COLOR_EVAL_DIV		2U		//20ms * 50 = 1s (color_sense가 1초 호출 가정)
+
+
+static color_sense_t s_color;		//카드 명령 누적 상태
 
 
 
@@ -76,15 +83,59 @@ static void publish_ir(void)
 }
 
 
+volatile uint16_t red = 0;
+volatile uint16_t green = 0;
+volatile uint16_t blue = 0;
+
+color_t d_c = 0;
+
+static void publish_color(void)
+{
+	bh1749_color_data_t l = bh1749_read_rgbir(BH1749_ADDR_LEFT);
+	bh1749_color_data_t r = bh1749_read_rgbir(BH1749_ADDR_RIGHT);
+
+	/* 디버그 워치용 */
+	red   = l.red;
+	green = l.green;
+	blue  = l.blue;
+
+	color_sense_result_t res;
+	color_sense_update(&s_color, &l, &r, &res);
+
+	/* (1) 현재 인식 중인 색: 매 호출 전역 갱신 (PC 라이브 표시용) */
+	sensor_state_update_color(res.cur_color);
+	d_c = res.cur_color;
+
+	/* (2) 확정 카드 명령: 새 카드일 때만 전역 갱신 + 이벤트 */
+	if (res.card_inserted)
+	{
+		if (sensor_state_update_card(res.inserted_cmd, res.count))
+		{
+			ui_msg_t msg =
+			{
+				.type       = UI_EVT_CARD_INSERTED,
+				.card       = res.inserted_cmd,
+				.card_count = res.count,
+			};
+			osMessageQueuePut(ui_queue, &msg, 0, 0);
+		}
+	}
+}
+
+
 void sensor_task(void *argument)
 {
 	(void)argument;
 
 	ir_init();
+	color_init();
+	color_sense_init(&s_color);
 
 	uint32_t tick 		= tick_now();
-	uint32_t bat_div	= 0;
+
 	uint32_t ir_div		= 0;
+	uint32_t bat_div	= 0;
+	uint32_t color_div  = 0;
 
 	for (;;)
 	{
@@ -98,6 +149,12 @@ void sensor_task(void *argument)
 		{
 			bat_div = 0;
 			publish_battery();
+		}
+
+		if (++color_div > COLOR_EVAL_DIV)	//40ms
+		{
+			color_div = 0;
+			publish_color();
 		}
 
 		tick += 20;
