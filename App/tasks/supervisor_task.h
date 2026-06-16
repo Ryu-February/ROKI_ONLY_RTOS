@@ -8,6 +8,6 @@
 #ifndef TASKS_SUPERVISOR_TASK_H_
 #define TASKS_SUPERVISOR_TASK_H_
 
-
+void supervisor_task(void *argument);
 
 #endif /* TASKS_SUPERVISOR_TASK_H_ */
