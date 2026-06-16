@@ -33,6 +33,7 @@ void input_task(void *argument)
 			msg.type = UI_EVT_BTN_PRESSED;
 
 			osMessageQueuePut(ui_queue, &msg, 0, osWaitForever);
+//			osMessageQueuePut()
 		}
 
 		tick += 1;

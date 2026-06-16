@@ -61,10 +61,10 @@ void ui_feedback_btn_press_start(btn_id_t btn)
 {
 	// 1. LED 피드백
 	color_t c = color_by_button(btn);
-	rgb_set_color(RGB_ZONE_V_SHAPE, c);
+//	rgb_set_color(RGB_ZONE_V_SHAPE, c);
 
 	// 2. 부저 피드백
-	buzzer_by_button(btn);
+//	buzzer_by_button(btn);
 }
 
 void ui_feedback_btn_press_timeout(void)
@@ -99,7 +99,7 @@ void ui_feedback_on_obstacle(uint16_t detected)
 
 void ui_feedback_indicate_card(color_mode_t cmd)
 {
-	rgb_set_color(RGB_ZONE_V_SHAPE, color_by_card(cmd));
+//	rgb_set_color(RGB_ZONE_V_SHAPE, color_by_card(cmd));
 	buzzer_play_dir_click_soft();
 }
 

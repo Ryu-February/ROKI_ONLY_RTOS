@@ -26,6 +26,7 @@ const static task_init_t s_task_table[] =
 osMessageQueueId_t ui_queue;
 osMessageQueueId_t ctrl_queue;
 osMessageQueueId_t rx_queue;
+osMessageQueueId_t spvr_queue;
 
 void app_init(void)
 {
