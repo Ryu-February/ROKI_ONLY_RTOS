@@ -16,6 +16,8 @@
 #include "input_task.h"
 #include "sensor_task.h"
 #include "control_task.h"
+#include "comms_task.h"
+
 
 typedef struct
 {

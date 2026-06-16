@@ -15,6 +15,8 @@
 #include "buzzer.h"
 #include "stepper.h"
 
+#include "msg_types.h"
+
 #define UART_RX_DMA_BUFSZ	128
 
 
@@ -56,14 +58,9 @@ void bsp_isr_tim7_callback(void) /*50us timer - rgb led timer*/
 }
 
 static volatile uint16_t rx_last_pos = 0;
-volatile uint32_t cb_hit_count = 0;
-
-extern osMessageQueueId_t rx_queue;
 
 void bsp_usart3_gpdma_ch1_callback(uint16_t size)
 {
-	cb_hit_count++;
-
 	if (size == rx_last_pos)
 	{
 		return;

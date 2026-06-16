@@ -57,6 +57,6 @@ typedef struct
 
 extern osMessageQueueId_t ui_queue;
 extern osMessageQueueId_t ctrl_queue;
-
+extern osMessageQueueId_t rx_queue;
 
 #endif /* IPC_MSG_TYPES_H_ */
