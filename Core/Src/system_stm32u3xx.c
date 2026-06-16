@@ -165,7 +165,7 @@ const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
 /** @addtogroup STM32U3xx_System_Private_Functions
   * @{
   */
-
+extern uint32_t __isr_vector_addr;
 /**
   * @brief  Setup the microcontroller system.
   * @param  None
@@ -177,7 +177,8 @@ void SystemInit(void)
 #if (__FPU_PRESENT == 1) && (__FPU_USED == 1)
   SCB->CPACR |= ((3UL << 20U)|(3UL << 22U));  /* set CP10 and CP11 Full Access */
 #endif
-
+  SCB->VTOR = (uint32_t)&__isr_vector_addr;  // ★ 벡터 테이블을 앱으로 재배치 (0x08011800)
+  __DSB(); __ISB();                           // 파이프라인 동기화
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
   SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation */

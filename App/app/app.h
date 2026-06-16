@@ -17,7 +17,7 @@
 #include "sensor_task.h"
 #include "control_task.h"
 #include "comms_task.h"
-
+#include "supervisor_task.h"
 
 typedef struct
 {
@@ -26,6 +26,8 @@ typedef struct
 	uint32_t 		stack_size;
 	osPriority_t 	priority;
 }task_init_t;
+
+
 
 
 void app_init(void);

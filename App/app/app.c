@@ -9,8 +9,6 @@
 #include "app.h"
 
 
-
-
 const static task_init_t s_task_table[] =
 {
 		{ ui_task	, 		"ui_task", 			128 * 4, 	osPriorityLow 			},

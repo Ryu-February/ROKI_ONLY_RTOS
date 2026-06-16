@@ -47,17 +47,43 @@ MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 192K
   RAM2    (xrw)    : ORIGIN = 0x20030000,   LENGTH = 64K
-  FLASH    (rx)    : ORIGIN = 0x08000000,   LENGTH = 512K
+  
+  TAG	 	(rx)	: ORIGIN = 0x08010000,   	LENGTH = 2K
+  KEYMAP 	(rx)	: ORIGIN = 0x08010800,   	LENGTH = 2K
+  SYSTEM 	(rx)	: ORIGIN = 0x08011000,   	LENGTH = 4K
+  
+  FLASH    (rx)    : ORIGIN = 0x08012000,   LENGTH = 512K - 64K - 2K - 2K - 4K
 }
-
 /* Sections */
 SECTIONS
 {
-
+	.tag :
+  {
+    . = ALIGN(4);
+    __flash_tag_addr = .;
+    KEEP(*(.tag))
+    . = ALIGN(4);
+  } >TAG
+  
+  .keyMap_data :
+  {
+    . = ALIGN(4);
+    KEEP(*(.keyMap_data))
+    . = ALIGN(4);
+  } >KEYMAP
+  
+  .system_data :
+  {
+    . = ALIGN(4);
+    KEEP(*(.system_data))
+    . = ALIGN(4);
+  } >SYSTEM  
+  
   /* The startup code into "FLASH" Rom type memory */
   .isr_vector :
   {
     . = ALIGN(4);
+    __isr_vector_addr = .;
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >FLASH
