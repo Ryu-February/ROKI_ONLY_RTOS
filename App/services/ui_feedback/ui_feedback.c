@@ -114,3 +114,14 @@ void ui_feedback_disable(void)
 	rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
 	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
 }
+
+void ui_feedback_power_on(void)
+{
+	buzzer_play_pororororong();
+	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_WHITE);
+	led_on(LED_POWER_STAT_W);
+	led_off(LED_POWER_STAT_O);
+	led_on(LED_W_CONTROL);
+
+	osDelay(860);
+}

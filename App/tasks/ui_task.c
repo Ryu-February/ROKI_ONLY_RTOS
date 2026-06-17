@@ -16,7 +16,6 @@
 #include "sensor_state.h"
 
 static osTimerId_t rgb_off_timer_id;
-static osTimerId_t stby_enter_timer_id;
 
 
 static void rgb_off_timer_callback(void *argument)
@@ -31,6 +30,8 @@ static void rgb_off_timer_callback(void *argument)
 void ui_task(void *argument)
 {
 	(void)argument;
+
+	ui_feedback_power_on();	//전원 부팅 시 ui 실행
 
 	ui_feedback_init();
 
