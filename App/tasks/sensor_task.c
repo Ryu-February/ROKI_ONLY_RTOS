@@ -52,6 +52,8 @@ static void sensor_dispatch(const sensor_evt_t *e)
 	}
 }
 
+
+
 static void publish_battery(void)
 {
 	battery_state_t s_batt;
@@ -66,6 +68,20 @@ static void publish_battery(void)
 	{
 		osMessageQueuePut(ui_queue, &(ui_msg_t){ .type = UI_EVT_BAT_INDICATE }, 0, 0);
 	}
+}
+
+static void battery_init(void)
+{
+	battery_state_t s_batt = { 0 };
+	battery_result_t res;
+
+	bool running = false;
+	uint16_t adc = vbat_read_adc();
+
+	battery_monitor_update(&s_batt, adc, running, &res);
+	sensor_state_update_bat(res.low, res.pct);
+
+	osMessageQueuePut(ui_queue, &(ui_msg_t){ .type = UI_EVT_BAT_INDICATE, .bat_low = res.low }, 0, 0);
 }
 
 
@@ -130,6 +146,7 @@ void sensor_task(void *argument)
 	ir_init();
 	color_init();
 	color_sense_init(&s_color);
+	battery_init();
 
 	uint32_t tick 		= tick_now();
 

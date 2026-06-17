@@ -16,10 +16,10 @@
 #include "sensor_state.h"
 
 static osTimerId_t rgb_off_timer_id;
+static osTimerId_t stby_enter_timer_id;
 
 
-
-void rgb_off_timer_callback(void *argument)
+static void rgb_off_timer_callback(void *argument)
 {
 	(void)argument;
 
@@ -28,14 +28,13 @@ void rgb_off_timer_callback(void *argument)
 	osMessageQueuePut(ui_queue, &msg, 0, osWaitForever);
 }
 
-
 void ui_task(void *argument)
 {
 	(void)argument;
 
 	ui_feedback_init();
 
-	rgb_off_timer_id = osTimerNew(rgb_off_timer_callback, osTimerOnce, NULL, NULL);
+	rgb_off_timer_id 	= osTimerNew(rgb_off_timer_callback, osTimerOnce, NULL, NULL);
 
 	for (;;)
 	{
@@ -64,6 +63,9 @@ void ui_task(void *argument)
 				break;
 			case UI_EVT_CARD_INSERTED:
 				ui_feedback_indicate_card(sensor_state_get_card());
+				break;
+			case UI_EVT_STBY_ENTERED:
+				ui_feedback_disable();
 				break;
 			default:
 				break;

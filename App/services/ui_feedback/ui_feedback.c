@@ -12,6 +12,7 @@
 
 #include "ui_feedback.h"
 
+#include "stby_monitor.h"
 
 void ui_feedback_init(void)
 {
@@ -103,3 +104,13 @@ void ui_feedback_indicate_card(color_mode_t cmd)
 	buzzer_play_dir_click_soft();
 }
 
+void ui_feedback_disable(void)
+{
+	buzzer_play_shutdown_pororororong();
+
+	led_off(LED_W_CONTROL);
+	led_off(LED_POWER_STAT_W);
+	led_off(LED_POWER_STAT_O);
+	rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
+	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+}

@@ -24,6 +24,7 @@ static const btn_ch_cfg_t btn_cfg[BTN_COUNT] =
 		[BTN_EXECUTE]	= { GPIOB, GPIO_PIN_0  },
 		[BTN_RESUME]   	= { GPIOB, GPIO_PIN_1  },
 		[BTN_DELETE]   	= { GPIOB, GPIO_PIN_2  },
+		[BTN_POWER] 	= { GPIOA, GPIO_PIN_0  }
 };
 
 

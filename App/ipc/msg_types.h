@@ -19,6 +19,8 @@ typedef enum
 	UI_EVT_RGB_TIMEOUT,
 	UI_EVT_IR_DETECTED,
 	UI_EVT_CARD_INSERTED,
+	UI_EVT_STBY_ENTERED,
+	UI_EVT_STBY_TIMEOUT,
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -31,6 +33,7 @@ typedef struct
 	bool			bat_low;
 	color_mode_t	card;		// UI_EVT_CARD_INSERTED 시 확정된 명령
 	uint8_t			card_count;	// 누적 카드 개수
+	bool			stby_entered;
 }ui_msg_t;
 
 typedef enum
@@ -55,9 +58,24 @@ typedef struct
 	bool			ir_detected;
 }ctrl_msg_t;
 
+typedef enum
+{
+	SPVR_EVT_IDLE,
+	SPVR_EVT_STBY_ENTERED,
+	SPVR_EVT_STBY_TIMEOUT,
+	SPVR_EVT_COUNT,
+}spvr_evt_type_t;
+
+typedef struct
+{
+	bool			stby_pressed;
+	spvr_evt_type_t type;
+}spvr_msg_t;
+
 extern osMessageQueueId_t ui_queue;
 extern osMessageQueueId_t ctrl_queue;
 extern osMessageQueueId_t rx_queue;
 extern osMessageQueueId_t spvr_queue;
+extern osMessageQueueId_t stby_queue;
 
 #endif /* IPC_MSG_TYPES_H_ */

@@ -22,5 +22,6 @@ void ui_feedback_indicate_battery(bool low);
 void ui_feedback_on_obstacle(uint16_t detected);
 
 void ui_feedback_indicate_card(color_mode_t cmd);
+void ui_feedback_disable(void);
 
 #endif /* SERVICES_UI_FEEDBACK_UI_FEEDBACK_H_ */

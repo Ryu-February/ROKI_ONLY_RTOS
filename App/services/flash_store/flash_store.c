@@ -15,6 +15,21 @@ keyMap_table_t RAM_keyMapData[20];
 extern uint32_t __flash_tag_addr;
 extern uint32_t __isr_vector_addr;
 
+__attribute__((section(".tag"))) firmware_tag_t firmware_tag =
+{
+	.number = 0xA1B2C3D4,
+
+	// fw info
+	.tag_addr = (uint32_t)&__flash_tag_addr,
+	.fw_addr = (uint32_t)&__isr_vector_addr,
+	.tag_size = 2048,
+};
+
+__attribute__((section(".version"))) firmware_version_t firmware_version =
+{
+	"ROKI - V1-dev-1",		// version
+	"ROKI - Firmware"		// name
+};
 
 
 const system_table_t FLASH_systemData __attribute__((section(".system_data"))) =
@@ -64,21 +79,6 @@ const keyMap_table_t FLASH_keyMapData[20] __attribute__((section(".keyMap_data")
 	{0xFFFFFFFF, 0x00, 0xFF, 0xFF, 0xFF}	// 19
 };
 
-__attribute__((section(".tag"))) firmware_tag_t firmware_tag =
-{
-	.number = 0xA1B2C3D4,
-
-	// fw info
-	.tag_addr = (uint32_t)&__flash_tag_addr,
-	.fw_addr = (uint32_t)&__isr_vector_addr,
-	.tag_size = 2048,
-};
-
-__attribute__((section(".version"))) firmware_version_t firmware_version =
-{
-	"ROKI - V1-dev-1",		// version
-	"ROKI - Firmware"		// name
-};
 
 
 

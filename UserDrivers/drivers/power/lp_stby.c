@@ -236,7 +236,7 @@ static void enter_standby_safe(void)
 
 void lp_stby_on_5ms(void)
 {
-	if(++s_system_ms > 2000)
+	if(++s_system_ms > 400)		//400 * 5ms = 2sec
 		s_off_enabled = true;
 
     bool raw = btn_pressed_raw();   // LOW=눌림
@@ -284,14 +284,14 @@ void lp_stby_on_5ms(void)
                     s_power_off = true;				//color_sensor 마지막에 잘못 인식하는 거 방지하려고 함
 
                     s_bz_wait_ms = 860;
-//                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);//모터 동작 중에 끄면 모터 돌아가면서 끝나서 추가함(모터드라이버 sleep핀)
+                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);//모터 동작 중에 끄면 모터 돌아가면서 끝나서 추가함(모터드라이버 sleep핀)
                     buzzer_play_shutdown_pororororong();
 
-//					led_off(LED_W_CONTROL);
-//					led_off(LED_POWER_STAT_W);
-//					led_off(LED_POWER_STAT_O);
-//					rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
-//					rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+					led_off(LED_W_CONTROL);
+					led_off(LED_POWER_STAT_W);
+					led_off(LED_POWER_STAT_O);
+					rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
+					rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
                 }
 
             }

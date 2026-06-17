@@ -28,6 +28,7 @@ typedef enum
 	BTN_EXECUTE = 0,
 	BTN_DELETE,
 	BTN_RESUME,
+	BTN_POWER,
 	BTN_COUNT
 }btn_id_t;
 
