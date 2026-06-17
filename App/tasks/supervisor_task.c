@@ -9,23 +9,23 @@
 
 
 #include "utils.h"
+#include "msg_types.h"
 
 #include "lp_stby.h"
 #include "bootloader.h"
 
-#include "msg_types.h"
-
-#include "stby_monitor.h"
-#include "rgb.h"
+#include "heartbeat.h"
 
 
 #define SUPERVISOR_POLL_MS	5U							//루프 주기(ms)
 #define IWDG_REFRESH_DIV	(1000U / SUPERVISOR_POLL_MS)	//~1초마다 IWDG 갱신
 
+#define STBY_HOLD_TO_ENTER_MS	860U
 
-extern IWDG_HandleTypeDef hiwdg;
 
 static osTimerId_t stby_enter_timer_id;
+
+
 
 
 static void stby_enter_timer_callback(void *argument)
@@ -41,8 +41,6 @@ void supervisor_task(void *argument)
 {
 	(void)argument;
 
-	lp_stby_init();
-
 	uint32_t tick     = tick_now();
 	uint32_t iwdg_div = 0;
 
@@ -50,10 +48,10 @@ void supervisor_task(void *argument)
 
 	for (;;)
 	{
-		if (++iwdg_div >= IWDG_REFRESH_DIV)
+		if (++iwdg_div >= IWDG_REFRESH_DIV)	//전원 노이즈 대비(충전 USB C 커넥터 꽂으면 가끔 노이즈 발생 -> 프로그램 멈춤)
 		{
 			iwdg_div = 0;
-			HAL_IWDG_Refresh(&hiwdg);
+			heartbeat_tick();		//IWDG_Refresh로 갱신 못할 시 자동 종료 프로그램(생사 확인용)
 		}
 
 		/* 전원 버튼/유휴 타임아웃: 5ms 단위로 카운트.
@@ -70,7 +68,7 @@ void supervisor_task(void *argument)
 						osMessageQueuePut(ui_queue, &ui_msg, 0, 0);
 
 						osTimerStop(stby_enter_timer_id);
-						osTimerStart(stby_enter_timer_id, 860);
+						osTimerStart(stby_enter_timer_id, STBY_HOLD_TO_ENTER_MS);	//부저 소리 -> 860ms
 					}
 					break;
 				case SPVR_EVT_STBY_ENTERED:

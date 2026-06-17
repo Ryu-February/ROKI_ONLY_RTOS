@@ -12,7 +12,6 @@
 
 #include "ui_feedback.h"
 
-#include "stby_monitor.h"
 
 void ui_feedback_init(void)
 {

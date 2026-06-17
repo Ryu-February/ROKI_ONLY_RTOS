@@ -7,9 +7,7 @@
 
 
 #include "lp_stby.h"
-#include "buzzer.h"
-#include "rgb.h"
-#include "led.h"
+
 
 // ==== 하드웨어 핀 ====
 // PB1에 Delete 스위치 (프로젝트 기준)
@@ -17,16 +15,7 @@
 #define LP_STBY_BTN_PIN      GPIO_PIN_0
 
 // 내부 상태
-static bool		s_last_pressed   = false;	// 마지막 샘플(raw)
-static uint16_t s_stable_ms      = 0;   		// 같은 raw가 지속된 ms
-static bool 	s_stable_pressed = false;   	// 디바운스 통과 상태(1: not pressed)
-static uint32_t s_press_ms       = 0;   		// 눌림 지속 ms
 static bool     s_fired          = false;
-static bool		s_off_enabled	 = false;
-static uint32_t s_system_ms		 = 0;
-static uint32_t s_idle_ms 		 = 0;    // ms since last *user* activity
-static bool		s_power_off		 = false;
-
 static inline bool btn_pressed_raw(void)
 {
     // Active-Low: 눌림 → LOW
@@ -75,66 +64,6 @@ static void reenter_standby_now(void)
     }
 }
 
-// 부팅 초기에 가장 먼저 호출
-void lp_stby_boot_gate(void)
-{
-    // WKUP1이 혹시 켜져 있었다면 우선 꺼서 부팅 초기 판정에 간섭 못 하게
-//	HAL_Delay(1000);//눈 속임용으로 1초 누를 때 켜지게끔 함 (야매임 ㅇㅇ)
-
-	ensure_wkup1_off_at_boot();
-
-    // 콜드부팅이면 바로 통과
-    if (!was_from_standby())
-    {
-        return;
-    }
-
-    // Standby 복귀 플래그 정리
-    clear_standby_flag();
-
-    // RC 충전/노이즈 여유
-    HAL_Delay(1000);//지금 여기 자체 안 들어옴
-
-    // 1초 길게 누름을 *부팅 초기에* 요구
-    // 디바운스 포함: 먼저 LP_STBY_DEBOUNCE_MS 동안 연속 눌림 확인 → 그 다음 1s 지속
-    uint16_t stable_ms = 0;
-
-    // (A) 디바운스 구간
-    while (stable_ms < LP_STBY_DEBOUNCE_MS)
-    {
-        if (!btn_pressed_raw())
-        {
-            reenter_standby_now();           // 눌리지 않았다 → 즉시 재진입
-        }
-        HAL_Delay(1);
-        stable_ms++;
-    }
-
-    // (B) 홀드 구간(1초)
-    uint16_t hold = 0;
-    while (hold < LP_STBY_WAKE_HOLD_MS)
-    {
-        if (!btn_pressed_raw())
-        {
-            reenter_standby_now();           // 유지 실패 → 즉시 재진입
-        }
-        HAL_Delay(1);
-        hold++;
-    }
-
-    // 여기 도달 = “1초 길게 눌러 켜기” 성공 → 정상 부팅 진행
-}
-
-void lp_stby_init(void)
-{
-    bool pressed = btn_pressed_raw();
-
-    s_last_pressed   = pressed;		  // 0: pressed(활성저레벨 가정), 1: not pressed
-    s_stable_pressed = pressed;
-    s_stable_ms      = 0;
-    s_press_ms       = 0;
-    s_fired          = false;
-}
 
 static void wkup1_config_for_active_low(void)
 {
@@ -216,11 +145,11 @@ static bool wkup1_arm_for_pa0(void)
     return true;
 }
 
-static void enter_standby_safe(void)
+void enter_standby_safe(void)
 {
     // 릴리즈(High) 최종 소프트 체크
-    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_SET)
-    	return;
+//    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_SET)
+//    	return;
 
     lp_stby_prepare_before();
 
@@ -233,202 +162,3 @@ static void enter_standby_safe(void)
     HAL_PWREx_EnterSHUTDOWNMode();
     while (1) { }
 }
-
-void lp_stby_on_5ms(void)
-{
-	if(++s_system_ms > 400)		//400 * 5ms = 2sec
-		s_off_enabled = true;
-
-    bool raw = btn_pressed_raw();   // LOW=눌림
-
-    // --- 디바운스 갱신 ---
-    if (raw == s_last_pressed)
-    {
-        if (s_stable_ms < 0xFFFF)
-        {
-            s_stable_ms++;
-        }
-    }
-    else
-    {
-        s_stable_ms   = 0;
-        s_last_pressed = raw;
-    }
-
-    if (s_stable_ms == LP_STBY_DEBOUNCE_MS)
-    {
-        s_stable_pressed = raw;     // 여기서 비로소 true/false로 “안정된 상태” 확정
-    }
-
-    // --- 상태머신 ---
-    static enum { IDLE, HOLDING, ARMED } s_state = IDLE;
-    static uint16_t s_bz_wait_ms = 0;
-
-    switch (s_state)
-    {
-        case IDLE:
-        {
-        	if (!s_off_enabled)
-        		return;
-
-            if (s_stable_pressed)   // 눌림(디바운스 통과)
-            {
-                if (s_press_ms < 0x7FFFFFFF)
-                {
-                    s_press_ms++;
-                }
-
-                if (s_press_ms >= LP_STBY_HOLD_MS)  // 0.5초 이상 눌림
-                {
-                    s_state = HOLDING;
-                    s_power_off = true;				//color_sensor 마지막에 잘못 인식하는 거 방지하려고 함
-
-                    s_bz_wait_ms = 860;
-                    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_12, GPIO_PIN_RESET);//모터 동작 중에 끄면 모터 돌아가면서 끝나서 추가함(모터드라이버 sleep핀)
-                    buzzer_play_shutdown_pororororong();
-
-					led_off(LED_W_CONTROL);
-					led_off(LED_POWER_STAT_W);
-					led_off(LED_POWER_STAT_O);
-					rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
-					rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
-                }
-
-            }
-            else
-            {
-                s_press_ms = 0;
-            }
-        } break;
-
-        case HOLDING:
-        {
-        	if(--s_bz_wait_ms == 0)//when the buzzer sounds end, it gonna be entered standby mode
-        	{
-        		s_state = ARMED;
-        	}
-        } break;
-
-        case ARMED:
-        {
-        	enter_standby_safe();
-        } break;
-    }
-
-
-    // --- Inactivity timeout: enter standby after 60 s with no *user* button events
-
-
-    static bool s_warn_started = false;   // played the pre-standby warning already?
-    static enum { NOT_ENTERED, ENTERED }s_warn_state = NOT_ENTERED;
-    static uint32_t s_warn_per_10s = 0;
-
-    // If someone else called lp_stby_mark_activity(), handle stop-on-activity
-	if (s_idle_ms == 0 && s_warn_started)
-	{
-
-//		buzzer_stop();   // stop soft pre-standby warning
-		s_warn_started = false;
-		s_warn_per_10s = 0;
-	}
-
-	switch (s_warn_state)
-	{
-		case NOT_ENTERED:
-		{
-			if (s_idle_ms < LP_STBY_IDLE_TIMEOUT_MS)
-			{
-				s_idle_ms++;
-
-				// Fire the warning exactly once at threshold
-				if (!s_warn_started && s_idle_ms == LP_STBY_BEFORE_WARN_MS)
-				{
-					// Choose one:
-					// buzzer_start_pre_standby_warning_soft_simple_60s();
-//					buzzer_warn_soft_low_chime();
-					s_warn_per_10s = 0;
-					s_warn_started = true;
-				}
-
-				// Every 20s after threshold: very soft chime
-				if (s_warn_started)
-				{
-					if (++s_warn_per_10s > 20000) // 20,000 ms (20s)
-					{
-						buzzer_warn_soft_low_chime();
-						s_warn_per_10s = 0;
-					}
-				}
-
-				// When we actually hit the timeout, go to standby
-				if (s_idle_ms >= LP_STBY_IDLE_TIMEOUT_MS)
-				{
-					// Optional: a gentle enter chime right before sleep
-					s_power_off = true;
-					s_warn_state = ENTERED;
-					s_bz_wait_ms = 860;
-					buzzer_play_shutdown_pororororong();
-
-					led_off(LED_W_CONTROL);
-					led_off(LED_POWER_STAT_W);
-					led_off(LED_POWER_STAT_O);
-					rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
-					rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
-				}
-			} break;
-		}
-		case ENTERED:
-		{
-			if(--s_bz_wait_ms == 0)//when the buzzer sounds end, it gonna be entered standby mode
-			{
-				enter_standby_safe();
-			}
-		} break;
-	}
-}
-
-
-
-void lp_stby_user_activity(void)
-{
-    s_idle_ms = 0;
-}
-
-uint32_t lp_stby_get_idle_ms(void)
-{
-    return s_idle_ms;
-}
-
-void lp_stby_check(void)
-{
-//    if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)
-//    {
-//        enter_standby_safe();			//Noise 땜에 갑자기 켜지는 경우가 있음 그거 방지용임
-//        return;
-//    }
-
-//    for (uint16_t i = 0; i < LP_STBY_DEBOUNCE_MS; i++)
-//    {
-//        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)	//혹여나 모르는 디바운스 방지용
-//        {
-//        	enter_standby_safe();
-//        }
-//        HAL_Delay(1);
-//    }
-
-//    for (uint16_t i = 0; i < 500; i++)
-//    {
-//        if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_0) != GPIO_PIN_RESET)	//500 + 30ms 눌렀을 때 켜지게
-//        {
-//        	enter_standby_safe();
-//        }
-//        HAL_Delay(1);
-//    }
-}
-
-bool lp_power_off(void)
-{
-	return s_power_off;
-}
-
-
