@@ -107,7 +107,7 @@ void ui_feedback_indicate_card(color_mode_t cmd)
 
 void ui_feedback_disable(void)
 {
-	buzzer_play_cosmic_shutdown_soft();
+	buzzer_play_space_exit();
 	rgb_effect_enable_gpio_sync(true);
 	rgb_effect_start(RGB_FX_SHUTDOWN_FADE, COLOR_WHITE);
 	osDelay(1300);
@@ -115,7 +115,7 @@ void ui_feedback_disable(void)
 
 void ui_feedback_power_on(void)
 {
-	buzzer_play_cosmic_boot_soft();
+	buzzer_play_space_enter();
 
 	rgb_effect_enable_gpio_sync(true);
 	rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_WHITE);

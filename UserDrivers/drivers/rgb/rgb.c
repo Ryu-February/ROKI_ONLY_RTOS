@@ -128,7 +128,7 @@ void rgb_tick(void)
 		if (rgb_effect_is_gpio_sync_active())
 		{
 			// 부팅 등 이펙트가 돌 때만 60µs 초고속 싱크 브리딩 구동!
-			r_on ? led_on(LED_W_CONTROL) : led_off(LED_W_CONTROL);
+			r_on ? led_on(LED_W_CONTROL) 	: led_off(LED_W_CONTROL);
 			r_on ? led_on(LED_POWER_STAT_W) : led_off(LED_POWER_STAT_W);
 		}
     }

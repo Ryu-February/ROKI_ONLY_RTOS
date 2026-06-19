@@ -816,3 +816,75 @@ void buzzer_play_bootloader_cosmic(void)
     // 아주 낮은 349Hz(F4) 음을 길게 빼서 "여긴 전혀 다른 공간이다"라는 시각적 착각을 줍니다.
     (void)buzzer_tone_pattern( 349, 320, 0, 1, 20);
 }
+
+void buzzer_play_space_enter(void)
+{
+    buzzer_stop();
+
+    (void)buzzer_tone_pattern( 523, 70, 10, 1, 20);
+    (void)buzzer_tone_pattern( 659, 70, 10, 1, 22);
+    (void)buzzer_tone_pattern( 784, 80, 10, 1, 24);
+    (void)buzzer_tone_pattern( 988, 90, 10, 1, 26);
+
+    // 우주 도착
+    (void)buzzer_tone_pattern(1318, 280, 0, 1, 20);
+}
+
+void buzzer_play_space_exit(void)
+{
+    buzzer_stop();
+
+    (void)buzzer_tone_pattern(1318, 90, 10, 1, 20);
+    (void)buzzer_tone_pattern( 988, 80, 10, 1, 22);
+    (void)buzzer_tone_pattern( 784, 70, 10, 1, 24);
+    (void)buzzer_tone_pattern( 659, 70, 10, 1, 24);
+
+    // 현실 복귀
+    (void)buzzer_tone_pattern( 523, 250, 0, 1, 18);
+}
+
+void buzzer_play_cosmic_boot_low(void)
+{
+    buzzer_stop();
+
+    (void)buzzer_tone_pattern(280, 120, 10, 1, 18);
+    (void)buzzer_tone_pattern(340, 100, 10, 1, 20);
+    (void)buzzer_tone_pattern(420, 100, 10, 1, 22);
+    (void)buzzer_tone_pattern(520, 120, 10, 1, 24);
+
+    // 우주 게이트 진입
+    (void)buzzer_tone_pattern(680, 300, 0, 1, 20);
+}
+
+void buzzer_play_cosmic_shutdown_low(void)
+{
+    buzzer_stop();
+
+    (void)buzzer_tone_pattern(680, 120, 10, 1, 20);
+    (void)buzzer_tone_pattern(520, 100, 10, 1, 22);
+    (void)buzzer_tone_pattern(420, 100, 10, 1, 20);
+    (void)buzzer_tone_pattern(340, 120, 10, 1, 18);
+
+    // 엔진 정지
+    (void)buzzer_tone_pattern(260, 350, 0, 1, 12);
+}
+
+
+void buzzer_play_bootloader_blackhole(void)
+{
+    buzzer_stop();
+
+    // 게이트 활성화
+    (void)buzzer_tone_pattern(280, 120, 20, 1, 18);
+    (void)buzzer_tone_pattern(340, 120, 20, 1, 18);
+
+    // 에너지 축적
+    (void)buzzer_tone_pattern(420, 140, 20, 1, 20);
+    (void)buzzer_tone_pattern(520, 140, 20, 1, 20);
+
+    // 차원 이동 시작
+    (void)buzzer_tone_pattern(650, 180, 20, 1, 18);
+
+    // 부트로더 공간 진입
+    (void)buzzer_tone_pattern(820, 420, 0, 1, 12);
+}

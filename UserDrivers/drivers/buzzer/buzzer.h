@@ -140,4 +140,12 @@ void buzzer_play_cosmic_boot_v2(void);
 void buzzer_play_cosmic_shutdown_v2(void);
 void buzzer_play_bootloader_cosmic(void);
 
+void buzzer_play_space_enter(void);
+void buzzer_play_space_exit(void);
+
+void buzzer_play_cosmic_boot_low(void);
+void buzzer_play_cosmic_shutdown_low(void);
+
+void buzzer_play_bootloader_blackhole(void);
+
 #endif /* BUZZER_BUZZER_H_ */

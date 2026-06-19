@@ -117,9 +117,12 @@ void rgb_effect_tick(void)
     s_tick_acc = 0;
 
     /* [핵심] 순수 삼각파 구현: 0 -> 255 -> 0 */
-    if (s_step < 256) {
+    if (s_step < 256)
+    {
         bright = gamma_lut[s_step];               // 0번부터 255번까지 서서히 밝아짐 (Up)
-    } else {
+    }
+    else
+    {
         bright = gamma_lut[511u - s_step];       // 255번부터 0번까지 서서히 어두워짐 (Down)
     }
 

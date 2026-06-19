@@ -91,7 +91,7 @@ void bootloader_combo_tick(void)
 			}
 			else if ((uint32_t)(tick - s_boot_seq_start_ms) >= BOOT_COMBO_HOLD_MS)
 			{
-				buzzer_play_bootloader_cosmic();
+				buzzer_play_bootloader_blackhole();
 				rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_SKY_BLUE);
 				s_boot_seq_state = BOOT_SEQ_WAIT_BUZZER;
 			}
