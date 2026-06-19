@@ -20,6 +20,8 @@ typedef enum
 {
 	RGB_ZONE_V_SHAPE = 0,
 	RGB_ZONE_EYES,
+	LED_POWER_W, // 단색 화이트 LED 존 추가
+	LED_W_CTRL,  // 단색 백라이트 제어 존 추가
 	RGB_ZONE_COUNT
 } rgb_zone_t;
 
@@ -55,5 +57,7 @@ void rgb_set_color(rgb_zone_t zone, color_t color);
 void rgb_set_rgb(rgb_zone_t zone, uint8_t r, uint8_t g, uint8_t b);
 void rgb_tick(void);   // 타이머 ISR(또는 주기 함수)에서 호출
 void rgb_blink_init(void);
+
+const rgb_led_t *rgb_get_led_map(color_t color);
 
 #endif /* RGB_RGB_H_ */

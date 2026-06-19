@@ -8,6 +8,7 @@
 
 #include "led.h"
 #include "rgb.h"
+#include "rgb_effect.h"
 #include "buzzer.h"
 
 #include "ui_feedback.h"
@@ -17,6 +18,7 @@ void ui_feedback_init(void)
 {
 	led_init();
 	rgb_init();
+	rgb_effect_init();
 }
 
 static color_t color_by_button(btn_id_t id)
@@ -105,22 +107,22 @@ void ui_feedback_indicate_card(color_mode_t cmd)
 
 void ui_feedback_disable(void)
 {
-	buzzer_play_shutdown_pororororong();
-
-	led_off(LED_W_CONTROL);
-	led_off(LED_POWER_STAT_W);
-	led_off(LED_POWER_STAT_O);
-	rgb_set_color(RGB_ZONE_EYES, COLOR_BLACK);
-	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+	buzzer_play_cosmic_shutdown_soft();
+	rgb_effect_enable_gpio_sync(true);
+	rgb_effect_start(RGB_FX_SHUTDOWN_FADE, COLOR_WHITE);
+	osDelay(1300);
 }
 
 void ui_feedback_power_on(void)
 {
-	buzzer_play_pororororong();
-	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_WHITE);
-	led_on(LED_POWER_STAT_W);
-	led_off(LED_POWER_STAT_O);
-	led_on(LED_W_CONTROL);
+	buzzer_play_cosmic_boot_soft();
 
-	osDelay(860);
+	rgb_effect_enable_gpio_sync(true);
+	rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_WHITE);
+//	rgb_effect_start(RGB_FX_SHUTDOWN_FADE, COLOR_WHITE);
+
+	osDelay(1300);
 }
+
+
+

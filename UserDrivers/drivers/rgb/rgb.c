@@ -12,6 +12,8 @@
 #include "bsp_isr.h"
 #include "board.h"
 
+#include "rgb_effect.h"
+
 
 const rgb_led_t led_map[COLOR_COUNT] =
 {
@@ -121,6 +123,14 @@ void rgb_tick(void)
         uint8_t g_on = (pwm_counter > (uint8_t)(255 - duty[RGB_ZONE_V_SHAPE][CH_G]));
         uint8_t b_on = (pwm_counter > (uint8_t)(255 - duty[RGB_ZONE_V_SHAPE][CH_B]));
         apply_zone(RGB_ZONE_V_SHAPE, r_on, g_on, b_on);
+
+        // 2. 캡슐화된 함수로 조건 검사 (전역 변수 없음!)
+		if (rgb_effect_is_gpio_sync_active())
+		{
+			// 부팅 등 이펙트가 돌 때만 60µs 초고속 싱크 브리딩 구동!
+			r_on ? led_on(LED_W_CONTROL) : led_off(LED_W_CONTROL);
+			r_on ? led_on(LED_POWER_STAT_W) : led_off(LED_POWER_STAT_W);
+		}
     }
 
 //    // EYES
@@ -130,4 +140,11 @@ void rgb_tick(void)
 //        uint8_t b_on = (pwm_counter > (uint8_t)(255 - duty[RGB_ZONE_EYES][CH_B]));
 //        apply_zone(RGB_ZONE_EYES, r_on, g_on, b_on);
 //    }
+}
+
+
+const rgb_led_t *rgb_get_led_map(color_t color)
+{
+    if (color >= COLOR_COUNT) return &led_map[COLOR_BLACK];
+    return &led_map[color];
 }

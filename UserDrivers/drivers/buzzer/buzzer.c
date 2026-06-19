@@ -646,3 +646,173 @@ void buzzer_play_recognition_on(void)
     (void)buzzer_tone_pattern(1450, 60, 20, 1, 52);
     (void)buzzer_tone_pattern(1800, 90,  0, 1, 52);
 }
+
+
+void buzzer_play_cosmic_shutdown(void)
+{
+    // 즉시 정지 후 시작
+    buzzer_stop();
+
+    // 1~3 스텝: 고음에서 신호가 끊기기 시작하는 페이드아웃 도입 (각 20ms)
+    (void)buzzer_tone_pattern(3200, 20, 0, 1, 45);
+    (void)buzzer_tone_pattern(2700, 20, 0, 1, 45);
+    (void)buzzer_tone_pattern(2200, 20, 0, 1, 45);
+
+    // 4~7 스텝: 중력에 이끌려 빠르게 하강 (각 25ms)
+    (void)buzzer_tone_pattern(1800, 25, 0, 1, 48);
+    (void)buzzer_tone_pattern(1450, 25, 0, 1, 50);
+    (void)buzzer_tone_pattern(1150, 25, 0, 1, 50);
+    (void)buzzer_tone_pattern( 900, 30, 0, 1, 50);
+
+    // 8~11 스텝: 무한한 심연으로 가라앉듯 톤이 묵직해지며 늘어짐 (각 45ms)
+    (void)buzzer_tone_pattern( 700, 45, 0, 1, 45);
+    (void)buzzer_tone_pattern( 550, 50, 0, 1, 40);
+    (void)buzzer_tone_pattern( 430, 60, 0, 1, 30);
+    (void)buzzer_tone_pattern( 350, 80, 0, 1, 15); // 최저음에서 소멸
+
+    // 마지막에 완벽한 무음 갭을 줘서 안전하게 끝맺음
+    (void)buzzer_tone_pattern( 100,  0, 50, 1,  1);
+}
+
+void buzzer_play_cosmic_boot(void)
+{
+    // 이전 소리 정리
+    buzzer_stop();
+
+    // 1~4 스텝: 저음역대에서 에너지가 모이는 부드러운 시작 (각 35ms)
+    (void)buzzer_tone_pattern( 600, 35, 0, 1, 40);
+    (void)buzzer_tone_pattern( 650, 35, 0, 1, 42);
+    (void)buzzer_tone_pattern( 720, 35, 0, 1, 45);
+    (void)buzzer_tone_pattern( 820, 35, 0, 1, 48);
+
+    // 5~9 스텝: 차원이 열리며 급격하게 치솟는 중음역대 스윕 (각 20ms로 속도 업)
+    (void)buzzer_tone_pattern( 970, 20, 0, 1, 50);
+    (void)buzzer_tone_pattern(1180, 20, 0, 1, 50);
+    (void)buzzer_tone_pattern(1450, 20, 0, 1, 50);
+    (void)buzzer_tone_pattern(1800, 20, 0, 1, 50);
+    (void)buzzer_tone_pattern(2250, 20, 0, 1, 50);
+
+    // 10~12 스텝: 우주 공간에 도달한 초고음 하이라이트 (각 15ms)
+    (void)buzzer_tone_pattern(2800, 15, 0, 1, 45);
+    (void)buzzer_tone_pattern(3400, 15, 0, 1, 40);
+    (void)buzzer_tone_pattern(3900, 25, 0, 1, 35); // 피크 점
+
+    // 마무리: 신비롭게 퍼지는 우주 잔향 (초고음에서 살짝 꺾인 2.4kHz로 부드럽게 롱~ 유지)
+    (void)buzzer_tone_pattern(2400, 250, 0, 1, 30); // Duty를 낮춰 부드러운 여운 생성
+}
+
+
+void buzzer_play_cosmic_boot_soft(void)
+{
+    buzzer_stop();
+
+    // 1~4 스텝: 바닥에서 웅- 하고 맴도는 묵직한 저음 (Duty 35~40%로 부드럽게)
+    (void)buzzer_tone_pattern( 550, 40, 0, 1, 35);
+    (void)buzzer_tone_pattern( 620, 40, 0, 1, 38);
+    (void)buzzer_tone_pattern( 700, 35, 0, 1, 40);
+    (void)buzzer_tone_pattern( 800, 35, 0, 1, 40);
+
+    // 5~8 스텝: 매끄럽게 상승하는 중음역대 (Duty를 35%로 고정하여 톤을 일정하게 유지)
+    (void)buzzer_tone_pattern( 950, 25, 0, 1, 35);
+    (void)buzzer_tone_pattern(1150, 25, 0, 1, 35);
+    (void)buzzer_tone_pattern(1400, 25, 0, 1, 35);
+    (void)buzzer_tone_pattern(1700, 25, 0, 1, 30);
+
+    // 9~11 스텝: 최고음 대역이지만 Duty를 25%로 낮춰 소리를 얇고 둥글게 만듦
+    (void)buzzer_tone_pattern(2000, 20, 0, 1, 25);
+    (void)buzzer_tone_pattern(2200, 25, 0, 1, 25); // 피크 주파수를 2.2kHz로 제한
+
+    // 마무리: 공중에 부유하는 듯한 부드럽고 신비로운 웅— (Sustain)
+    (void)buzzer_tone_pattern(1500, 210, 0, 1, 25);
+}
+
+void buzzer_play_cosmic_shutdown_soft(void)
+{
+    buzzer_stop();
+
+    // 1~3 스텝: 고음부 도입을 아주 부드럽게 시작 (Duty 25%)
+    (void)buzzer_tone_pattern(2100, 25, 0, 1, 25);
+    (void)buzzer_tone_pattern(1850, 25, 0, 1, 25);
+    (void)buzzer_tone_pattern(1600, 25, 0, 1, 28);
+
+    // 4~7 스텝: 부드럽게 감속하며 낙하
+    (void)buzzer_tone_pattern(1350, 30, 0, 1, 30);
+    (void)buzzer_tone_pattern(1100, 30, 0, 1, 35);
+    (void)buzzer_tone_pattern( 900, 35, 0, 1, 35);
+    (void)buzzer_tone_pattern( 750, 35, 0, 1, 38);
+
+    // 8~10 스텝: 안개 속으로 사라지듯 톤이 깊어지며 소멸
+    (void)buzzer_tone_pattern( 620, 50, 0, 1, 40);
+    (void)buzzer_tone_pattern( 500, 60, 0, 1, 35);
+    (void)buzzer_tone_pattern( 400, 70, 0, 1, 20); // 마지막은 힘을 빼고 스르륵
+    (void)buzzer_tone_pattern( 300, 110, 0, 1, 10);
+
+    // 안전 마감 무음 갭
+    (void)buzzer_tone_pattern( 100,  0, 50, 1,  1);
+}
+
+void buzzer_play_cosmic_boot_v2(void)
+{
+    buzzer_stop();
+
+    // 1~3 스텝: 깊은 우주 속동력원이 켜지는 신호 (낮은 중음에서 시작)
+    (void)buzzer_tone_pattern( 880, 40, 0, 1, 35); // A5 음역대 기준 부드러운 시작
+    (void)buzzer_tone_pattern(1046, 40, 0, 1, 35); // C6 도달
+    (void)buzzer_tone_pattern(1318, 50, 0, 1, 30); // E6 도달 (조화로운 3도 화음 스윕)
+
+    // 4~7 스텝: 에너지가 부드러운 곡선을 그리며 하강 (날카로움을 없애는 반전 연출)
+    (void)buzzer_tone_pattern(1174, 30, 0, 1, 30);
+    (void)buzzer_tone_pattern( 987, 30, 0, 1, 35);
+    (void)buzzer_tone_pattern( 880, 30, 0, 1, 40);
+
+    // 마무리: 저음역대에서 묵직하고 따뜻하게 공간을 채우는 웅— (Sustain)
+    // 587Hz(D5) 부근에서 Duty를 25%로 낮춰 멀리서 울리는 듯한 황홀한 잔향을 만듭니다.
+    (void)buzzer_tone_pattern( 587, 370, 0, 1, 25);
+}
+
+void buzzer_play_cosmic_shutdown_v2(void)
+{
+    buzzer_stop();
+
+    // 1~4 스텝: 공간이 수축하기 시작하는 단계 (중고음에서 매끄럽게 하강)
+    (void)buzzer_tone_pattern(1567, 30, 0, 1, 25); // 1.5kHz 대역의 부드러운 시작
+    (void)buzzer_tone_pattern(1396, 30, 0, 1, 25);
+    (void)buzzer_tone_pattern(1174, 35, 0, 1, 30);
+    (void)buzzer_tone_pattern( 987, 35, 0, 1, 30);
+
+    // 5~8 스텝: 한 점으로 빨려 들어가며 음이 급격하게 쪼개짐
+    (void)buzzer_tone_pattern( 784, 40, 0, 1, 35);
+    (void)buzzer_tone_pattern( 659, 45, 0, 1, 30);
+    (void)buzzer_tone_pattern( 523, 55, 0, 1, 20); // 여기서부터 힘이 급격히 빠짐
+
+    // 9~10 스텝: 마지막 스파크가 튀듯 완전히 수축하며 소멸 (초저음 + 최소 Duty)
+    (void)buzzer_tone_pattern( 392, 70, 0, 1, 10);
+    (void)buzzer_tone_pattern( 261, 110, 0, 1, 5); // 261Hz(가온 도)의 아주 미약한 소리로 마감
+
+    // 안전 마감 무음 갭
+    (void)buzzer_tone_pattern( 100,  0, 50, 1,  1);
+}
+
+void buzzer_play_bootloader_cosmic(void)
+{
+    buzzer_stop();
+
+    // 1~3 스텝: 경고인 듯 신비로운 낯선 공간의 노크 소리 (짧고 묘한 리듬)
+    (void)buzzer_tone_pattern( 987, 40, 20, 1, 35); // 시(B5) 단음 틱-
+    (void)buzzer_tone_pattern(1479, 50, 40, 1, 30); // 파#(F#6) 높은 음 툭-- (신비로운 5도 음정)
+
+    // 4~8 스텝: 시스템이 미지의 코드를 읽어 내려가듯 주파수가 출렁이는 구간
+    (void)buzzer_tone_pattern(1109, 30, 0, 1, 35);
+    (void)buzzer_tone_pattern(1244, 30, 0, 1, 35);
+    (void)buzzer_tone_pattern(1109, 30, 0, 1, 35);
+    (void)buzzer_tone_pattern( 987, 45, 0, 1, 35);
+    (void)buzzer_tone_pattern( 880, 45, 0, 1, 40);
+
+    // 9~11 스텝: 게이트가 열리며 미지의 블랙홀 내부로 진입 (주파수가 바닥으로 급강하)
+    (void)buzzer_tone_pattern( 698, 50, 0, 1, 40);
+    (void)buzzer_tone_pattern( 554, 60, 0, 1, 35);
+
+    // 마무리 테일: 차원의 밑바닥에 도착하여 울리는 기괴하고 웅장한 공동(Cavity) 사운드
+    // 아주 낮은 349Hz(F4) 음을 길게 빼서 "여긴 전혀 다른 공간이다"라는 시각적 착각을 줍니다.
+    (void)buzzer_tone_pattern( 349, 320, 0, 1, 20);
+}

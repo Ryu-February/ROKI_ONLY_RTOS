@@ -12,6 +12,7 @@
 #include "utils.h"
 
 #include "rgb.h"
+#include "rgb_effect.h"
 #include "buzzer.h"
 #include "stepper.h"
 
@@ -55,6 +56,7 @@ void bsp_isr_tim6_callback(void)
 void bsp_isr_tim7_callback(void) /*50us timer - rgb led timer*/
 {
 	rgb_tick();
+	rgb_effect_tick();
 }
 
 static volatile uint16_t rx_last_pos = 0;

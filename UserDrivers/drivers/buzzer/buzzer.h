@@ -130,4 +130,14 @@ void buzzer_play_adj_right_enter(void);
 void buzzer_play_adj_fwd_enter(void);
 void buzzer_play_adj_exit(void);
 
+void buzzer_play_cosmic_boot(void);
+void buzzer_play_cosmic_shutdown(void);
+
+void buzzer_play_cosmic_boot_soft(void);
+void buzzer_play_cosmic_shutdown_soft(void);
+
+void buzzer_play_cosmic_boot_v2(void);
+void buzzer_play_cosmic_shutdown_v2(void);
+void buzzer_play_bootloader_cosmic(void);
+
 #endif /* BUZZER_BUZZER_H_ */

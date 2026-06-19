@@ -13,7 +13,7 @@
 #include "btn.h"
 #include "buzzer.h"
 #include "rgb.h"
-
+#include "rgb_effect.h"
 
 static void boot_write_bkp_data(uint32_t bkp_index, uint32_t data)
 {
@@ -91,7 +91,8 @@ void bootloader_combo_tick(void)
 			}
 			else if ((uint32_t)(tick - s_boot_seq_start_ms) >= BOOT_COMBO_HOLD_MS)
 			{
-				buzzer_play_bootloader_enter();
+				buzzer_play_bootloader_cosmic();
+				rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_SKY_BLUE);
 				s_boot_seq_state = BOOT_SEQ_WAIT_BUZZER;
 			}
 		} break;
@@ -101,7 +102,7 @@ void bootloader_combo_tick(void)
 			if (!buzzer_is_busy())
 			{
 				s_boot_led_count = 0;
-				rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLUE);
+//				rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLUE);
 				s_boot_led_ms = tick;
 				s_boot_seq_state = BOOT_SEQ_LED_ON;
 			}
@@ -111,7 +112,7 @@ void bootloader_combo_tick(void)
 		{
 			if ((uint32_t)(tick - s_boot_led_ms) >= 100U)
 			{
-				rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+//				rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
 				s_boot_led_ms = tick;
 				s_boot_led_count++;
 				if (s_boot_led_count >= 3U)
@@ -129,7 +130,7 @@ void bootloader_combo_tick(void)
 		{
 			if ((uint32_t)(tick - s_boot_led_ms) >= 100U)
 			{
-				rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_RED);
+//				rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_RED);
 				s_boot_led_ms = tick;
 				s_boot_seq_state = BOOT_SEQ_LED_ON;
 			}
