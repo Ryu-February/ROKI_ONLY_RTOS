@@ -55,6 +55,7 @@ typedef struct
 void rgb_init(void);
 void rgb_set_color(rgb_zone_t zone, color_t color);
 void rgb_set_rgb(rgb_zone_t zone, uint8_t r, uint8_t g, uint8_t b);
+void rgb_set_gpio_duty(uint8_t duty); // 단색 GPIO LED 전용 소프트 PWM 듀티(0~255)
 void rgb_tick(void);   // 타이머 ISR(또는 주기 함수)에서 호출
 void rgb_blink_init(void);
 

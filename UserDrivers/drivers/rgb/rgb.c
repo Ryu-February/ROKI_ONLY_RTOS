@@ -49,6 +49,9 @@ static volatile uint8_t duty[RGB_ZONE_COUNT][3] = {0};
 /* 공용 PWM 카운터(0~254) */
 static volatile uint8_t pwm_counter = 0;
 
+/* 단색 GPIO LED 전용 듀티(0~255). RGB 색과 독립적으로 밝기를 표현 */
+static volatile uint8_t gpio_duty = 0;
+
 /* Active-Low 보정된 핀 쓰기 */
 static inline void write_pin_active_low(uint16_t pin, uint8_t on)
 {
@@ -111,6 +114,11 @@ void rgb_set_rgb(rgb_zone_t zone, uint8_t r, uint8_t g, uint8_t b)
     duty[zone][CH_B] = b;
 }
 
+void rgb_set_gpio_duty(uint8_t d)
+{
+    gpio_duty = d;
+}
+
 
 // 타이머 주기마다 호출(예: 타이머 주파수/255 = 200~1000Hz 영역)
 void rgb_tick(void)
@@ -127,9 +135,11 @@ void rgb_tick(void)
         // 2. 캡슐화된 함수로 조건 검사 (전역 변수 없음!)
 		if (rgb_effect_is_gpio_sync_active())
 		{
-			// 부팅 등 이펙트가 돌 때만 60µs 초고속 싱크 브리딩 구동!
-			r_on ? led_on(LED_W_CONTROL) 	: led_off(LED_W_CONTROL);
-			r_on ? led_on(LED_POWER_STAT_W) : led_off(LED_POWER_STAT_W);
+			// 이펙트가 돌 때만 GPIO 단색 LED를 전용 듀티로 소프트 PWM 구동
+			// (RGB 색/R채널과 무관하게 gpio_duty 밝기 곡선을 따라감)
+			uint8_t gpio_on = (pwm_counter > (uint8_t)(255 - gpio_duty));
+			gpio_on ? led_on(LED_W_CONTROL) 	: led_off(LED_W_CONTROL);
+			gpio_on ? led_on(LED_POWER_STAT_W) : led_off(LED_POWER_STAT_W);
 		}
     }
 

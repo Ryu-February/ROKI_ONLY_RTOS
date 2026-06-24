@@ -821,26 +821,27 @@ void buzzer_play_space_enter(void)
 {
     buzzer_stop();
 
-    (void)buzzer_tone_pattern( 523, 70, 10, 1, 20);
-    (void)buzzer_tone_pattern( 659, 70, 10, 1, 22);
-    (void)buzzer_tone_pattern( 784, 80, 10, 1, 24);
-    (void)buzzer_tone_pattern( 988, 90, 10, 1, 26);
-
-    // 우주 도착
-    (void)buzzer_tone_pattern(1318, 280, 0, 1, 20);
+    (void)buzzer_tone_pattern(1000, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1300, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1600, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1400, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1800, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1600, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1900, 120, 0, 1, 30);
 }
 
 void buzzer_play_space_exit(void)
 {
     buzzer_stop();
 
-    (void)buzzer_tone_pattern(1318, 90, 10, 1, 20);
-    (void)buzzer_tone_pattern( 988, 80, 10, 1, 22);
-    (void)buzzer_tone_pattern( 784, 70, 10, 1, 24);
-    (void)buzzer_tone_pattern( 659, 70, 10, 1, 24);
+    (void)buzzer_tone_pattern(1800, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1500, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1700, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1300, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1500, 45, 10, 1, 40);
+    (void)buzzer_tone_pattern(1100, 45, 10, 1, 40);
 
-    // 현실 복귀
-    (void)buzzer_tone_pattern( 523, 250, 0, 1, 18);
+    (void)buzzer_tone_pattern(1300, 100, 0, 1, 25);
 }
 
 void buzzer_play_cosmic_boot_low(void)
@@ -874,17 +875,13 @@ void buzzer_play_bootloader_blackhole(void)
 {
     buzzer_stop();
 
-    // 게이트 활성화
-    (void)buzzer_tone_pattern(280, 120, 20, 1, 18);
-    (void)buzzer_tone_pattern(340, 120, 20, 1, 18);
+    (void)buzzer_tone_pattern(900 , 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1200, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1000, 40, 10, 1, 35);
 
-    // 에너지 축적
-    (void)buzzer_tone_pattern(420, 140, 20, 1, 20);
-    (void)buzzer_tone_pattern(520, 140, 20, 1, 20);
+    (void)buzzer_tone_pattern(1500, 60, 10, 1, 35);
+    (void)buzzer_tone_pattern(1300, 60, 10, 1, 35);
 
-    // 차원 이동 시작
-    (void)buzzer_tone_pattern(650, 180, 20, 1, 18);
-
-    // 부트로더 공간 진입
-    (void)buzzer_tone_pattern(820, 420, 0, 1, 12);
+    (void)buzzer_tone_pattern(1700, 80, 10, 1, 30);
+    (void)buzzer_tone_pattern(1450, 220, 0, 1, 25);
 }
