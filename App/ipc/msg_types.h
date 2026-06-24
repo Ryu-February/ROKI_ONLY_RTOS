@@ -21,6 +21,7 @@ typedef enum
 	UI_EVT_CARD_INSERTED,
 	UI_EVT_STBY_ENTERED,
 	UI_EVT_STBY_TIMEOUT,
+	UI_EVT_BOOT_ENTERED,
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -61,14 +62,16 @@ typedef struct
 typedef enum
 {
 	SPVR_EVT_IDLE,
+	SPVR_EVT_STBY_IDLE,
 	SPVR_EVT_STBY_ENTERED,
 	SPVR_EVT_STBY_TIMEOUT,
+	SPVR_EVT_BOOTLOADER_IDLE,
+	SPVR_EVT_BOOTLOADER_ENTERED,
 	SPVR_EVT_COUNT,
 }spvr_evt_type_t;
 
 typedef struct
 {
-	bool			stby_pressed;
 	spvr_evt_type_t type;
 }spvr_msg_t;
 

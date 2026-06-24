@@ -21,9 +21,11 @@
 #define IWDG_REFRESH_DIV	(1000U / SUPERVISOR_POLL_MS)	//~1초마다 IWDG 갱신
 
 #define STBY_HOLD_TO_ENTER_MS	860U
+#define BOOT_HOLD_TO_ENTER_MS	600U
 
 
 static osTimerId_t stby_enter_timer_id;
+static osTimerId_t boot_enter_timer_id;
 
 
 
@@ -37,6 +39,14 @@ static void stby_enter_timer_callback(void *argument)
 	osMessageQueuePut(spvr_queue, &msg, 0, 0);
 }
 
+static void boot_enter_timer_callback(void *argument)
+{
+	(void)argument;
+
+	spvr_msg_t msg = { .type = SPVR_EVT_BOOTLOADER_ENTERED };
+	osMessageQueuePut(spvr_queue, &msg, 0, 0);
+}
+
 void supervisor_task(void *argument)
 {
 	(void)argument;
@@ -45,6 +55,7 @@ void supervisor_task(void *argument)
 	uint32_t iwdg_div = 0;
 
 	stby_enter_timer_id = osTimerNew(stby_enter_timer_callback, osTimerOnce, NULL, NULL);
+	boot_enter_timer_id = osTimerNew(boot_enter_timer_callback, osTimerOnce, NULL, NULL);
 
 	for (;;)
 	{
@@ -62,17 +73,30 @@ void supervisor_task(void *argument)
 			switch (spvr_msg.type)
 			{
 				case SPVR_EVT_IDLE:
-					if (spvr_msg.stby_pressed)
-					{
-						ui_msg_t ui_msg = { .type = UI_EVT_STBY_ENTERED};	//ui_task에서 쓸 msg
-						osMessageQueuePut(ui_queue, &ui_msg, 0, 0);
+					break;
+				case SPVR_EVT_STBY_IDLE:
+				{
+					ui_msg_t ui_msg = { .type = UI_EVT_STBY_ENTERED };	//ui_task에서 쓸 msg
+					osMessageQueuePut(ui_queue, &ui_msg, 0, 0);
 
-						osTimerStop(stby_enter_timer_id);
-						osTimerStart(stby_enter_timer_id, STBY_HOLD_TO_ENTER_MS);	//부저 소리 -> 860ms
-					}
+					osTimerStop(stby_enter_timer_id);
+					osTimerStart(stby_enter_timer_id, STBY_HOLD_TO_ENTER_MS);	//부저 소리 -> 860ms
+				}
 					break;
 				case SPVR_EVT_STBY_ENTERED:
 					enter_standby_safe();
+					break;
+				case SPVR_EVT_BOOTLOADER_IDLE:
+				{
+					ui_msg_t ui_msg = { .type = UI_EVT_BOOT_ENTERED };
+					osMessageQueuePut(ui_queue, &ui_msg, 0, 0);
+
+					osTimerStop(boot_enter_timer_id);
+					osTimerStart(boot_enter_timer_id, BOOT_HOLD_TO_ENTER_MS);
+				}
+					break;
+				case SPVR_EVT_BOOTLOADER_ENTERED:
+					boot_enter_bootloader();
 					break;
 				default:
 					break;
@@ -80,7 +104,7 @@ void supervisor_task(void *argument)
 		}
 		/* 부트로더 진입 콤보(delete+execute+resume 2s 홀드).
 		   tim6_get_ms() 타임스탬프 기반이라 폴링 주기와 무관. */
-		bootloader_combo_tick();
+//		bootloader_combo_tick();
 
 		tick += SUPERVISOR_POLL_MS;
 		sleep_until(tick);

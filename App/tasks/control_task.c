@@ -26,14 +26,14 @@ void control_task(void *argument)
 		sensor_snapshot_t s;
 		sensor_state_get(&s);
 
-		if (s.ir_detected)
-		{
-			step_drive(OP_REVERSE);
-		}
-		else
-		{
-			step_drive(OP_STOP);
-		}
+//		if (s.ir_detected)
+//		{
+//			step_drive(OP_REVERSE);
+//		}
+//		else
+//		{
+//			step_drive(OP_STOP);
+//		}
 
 		tick += 20;
 		sleep_until(tick);
