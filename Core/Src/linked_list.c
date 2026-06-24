@@ -108,7 +108,7 @@ HAL_StatusTypeDef MX_RxQueue_Config(void)
   pNodeConfig.Init.DestDataWidth = DMA_DEST_DATAWIDTH_BYTE;
   pNodeConfig.Init.SrcBurstLength = 1;
   pNodeConfig.Init.DestBurstLength = 1;
-  pNodeConfig.Init.TransferAllocatedPort = DMA_SRC_ALLOCATED_PORT1|DMA_DEST_ALLOCATED_PORT1;
+  pNodeConfig.Init.TransferAllocatedPort = DMA_SRC_ALLOCATED_PORT1|DMA_DEST_ALLOCATED_PORT0;
   pNodeConfig.Init.TransferEventMode = DMA_TCEM_BLOCK_TRANSFER;
   pNodeConfig.Init.Mode = DMA_NORMAL;
   pNodeConfig.TriggerConfig.TriggerPolarity = DMA_TRIG_POLARITY_MASKED;

@@ -126,28 +126,54 @@ void rgb_effect_tick(void)
         bright = gamma_lut[511u - s_step];       // 255번부터 0번까지 서서히 어두워짐 (Down)
     }
 
-    /* 하드웨어 PWM 반영 */
+    /* 하드웨어 PWM 반영 (RGB는 0->255->0 삼각파 그대로) */
     uint8_t r = (uint8_t)((c->r * (uint16_t)bright) >> 8);
     uint8_t g = (uint8_t)((c->g * (uint16_t)bright) >> 8);
     uint8_t b = (uint8_t)((c->b * (uint16_t)bright) >> 8);
     rgb_set_rgb(RGB_ZONE_V_SHAPE, r, g, b);
 
+    /* GPIO 단색 LED는 RGB와 다른 전용 엔벨로프로 구동
+     *  - BOOT     : 상승만 따라가고(0->255) 정점 이후엔 255 고정  → 서서히 켜진 뒤 쭉 켜짐
+     *  - SHUTDOWN : 정점까지 255 고정 후 하강만 따라감(255->0)    → 쭉 켜져 있다 서서히 꺼짐
+     */
+    if (s_fx_include_gpio)
+    {
+        uint8_t gpio_bright;
+        if (s_fx_mode == RGB_FX_BOOT_BREATH)
+            gpio_bright = (s_step < 256) ? bright : 255;
+        else if (s_fx_mode == RGB_FX_SHUTDOWN_FADE)
+            gpio_bright = (s_step < 256) ? 255 : bright;
+        else
+            gpio_bright = bright;
+
+        rgb_set_gpio_duty(gpio_bright);
+    }
+
     /* 스텝 진행 및 자동 종료 제어 */
     if (++s_step >= 512)
     {
-    	if (s_fx_mode == RGB_FX_BOOT_BREATH && s_fx_include_gpio)	//일반 led (3개)
-		{
-			// 꺼지지 않고 100% 쨍하게 켠 상태로 고정시킵니다.
-    		led_on(LED_POWER_STAT_W); // 화이트 켬 (Active Low 가정)
-			led_on(LED_W_CONTROL);    // 백라이트 켬 (Active High 가정)
-		}
+        if (s_fx_include_gpio)
+        {
+            if (s_fx_mode == RGB_FX_BOOT_BREATH)
+            {
+                // 꺼지지 않고 100% 쨍하게 켠 상태로 고정
+                rgb_set_gpio_duty(255);
+                led_on(LED_POWER_STAT_W);
+                led_on(LED_W_CONTROL);
+            }
+            else if (s_fx_mode == RGB_FX_SHUTDOWN_FADE)
+            {
+                // 완전 소등
+                rgb_set_gpio_duty(0);
+                led_off(LED_POWER_STAT_W);
+                led_off(LED_W_CONTROL);
+            }
+        }
 
         s_fx_mode = RGB_FX_NONE;
         s_fx_include_gpio = false; // 플래그를 꺼서 다음 rgb_tick부터는 간섭 차단!
-        // 완료 후 최종 상태는 깔끔하게 소등(BLACK) 상태로 대기
+        // 완료 후 V_SHAPE(RGB)는 깔끔하게 소등(BLACK) 상태로 대기
         rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
-
-
     }
 }
 
