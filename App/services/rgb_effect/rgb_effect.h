@@ -15,10 +15,13 @@ typedef enum {
     RGB_FX_BOOT_BREATH,      // Black -> White 서서히 켜짐
     RGB_FX_SHUTDOWN_FADE,    // White -> Black 서서히 꺼짐
     RGB_FX_CARD_FLASH,       // 카드 인식 시 순간 번쩍
+    RGB_FX_BREATH_LOOP,     // 캘리브레이션 대기: 멈출 때까지 계속 호흡(반복)
+	RGB_FX_BREATH_CYCLE
 } rgb_fx_mode_t;
 
 void rgb_effect_init(void);
 void rgb_effect_start(rgb_fx_mode_t mode, color_t target_color);
+void rgb_effect_stop(void);  // 진행 중인 효과 중단 + 소등
 void rgb_effect_tick(void); // 60us TIM ISR에서 호출
 
 void rgb_effect_enable_gpio_sync(bool enable);

@@ -26,5 +26,5 @@ void ui_feedback_disable(void);
 void ui_feedback_power_on(void);
 
 void ui_feedback_boot_on(void);
-
+void ui_feedback_calib_on(void);
 #endif /* SERVICES_UI_FEEDBACK_UI_FEEDBACK_H_ */

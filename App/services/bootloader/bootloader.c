@@ -8,12 +8,6 @@
 
 #include "bootloader.h"
 
-#include "utils.h"
-
-#include "btn.h"
-#include "buzzer.h"
-#include "rgb.h"
-#include "rgb_effect.h"
 
 static void boot_write_bkp_data(uint32_t bkp_index, uint32_t data)
 {

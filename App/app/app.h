@@ -18,6 +18,7 @@
 #include "control_task.h"
 #include "comms_task.h"
 #include "supervisor_task.h"
+#include "calib_task.h"
 
 typedef struct
 {

@@ -34,9 +34,9 @@ void input_task(void *argument)
 			osMessageQueuePut(ui_queue, &msg, 0, 0);
 		}
 
-		if (btn_pop_long_press(BTN_EXECUTE, 2000)
-				&& btn_pop_long_press(BTN_DELETE, 2000)
-				&& btn_pop_long_press(BTN_RESUME, 2000))
+		if (btn_pop_long_press(BTN_RESUME, 2000))
+//				&& btn_pop_long_press(BTN_DELETE, 2000)
+//				&& btn_pop_long_press(BTN_EXECUTE, 2000))
 		{
 			spvr_msg_t msg = { .type = SPVR_EVT_BOOTLOADER_IDLE };
 			osMessageQueuePut(spvr_queue, &msg, 0, 0);
@@ -46,6 +46,12 @@ void input_task(void *argument)
 		{
 			spvr_msg_t msg = { .type = SPVR_EVT_STBY_IDLE };
 			osMessageQueuePut(spvr_queue, &msg, 0, 0);
+		}
+
+		if (btn_pop_long_press(BTN_EXECUTE, 2000))
+		{
+			calib_msg_t msg = { .pressed = true };
+			osMessageQueuePut(calib_queue, &msg, 0, 0);
 		}
 
 		tick += 1;

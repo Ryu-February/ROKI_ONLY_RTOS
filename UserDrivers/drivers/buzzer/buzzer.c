@@ -885,3 +885,15 @@ void buzzer_play_bootloader_blackhole(void)
     (void)buzzer_tone_pattern(1700, 80, 10, 1, 30);
     (void)buzzer_tone_pattern(1450, 220, 0, 1, 25);
 }
+
+void buzzer_play_calib_enter_v3(void)
+{
+    buzzer_stop();
+
+    (void)buzzer_tone_pattern(1000, 35, 10, 1, 35);
+    (void)buzzer_tone_pattern(1250, 35, 10, 1, 35);
+    (void)buzzer_tone_pattern(1450, 35, 10, 1, 35);
+    (void)buzzer_tone_pattern(1250, 35, 10, 1, 35);
+
+    (void)buzzer_tone_pattern(1650, 120, 0, 1, 25);
+}

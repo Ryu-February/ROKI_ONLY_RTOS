@@ -22,6 +22,8 @@ typedef enum
 	UI_EVT_STBY_ENTERED,
 	UI_EVT_STBY_TIMEOUT,
 	UI_EVT_BOOT_ENTERED,
+	UI_EVT_CALIB_ARMED,
+	UI_EVT_CALIB_MOVING,
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -54,6 +56,7 @@ typedef struct
 }sensor_evt_t;
 
 
+
 typedef struct
 {
 	bool			ir_detected;
@@ -75,10 +78,28 @@ typedef struct
 	spvr_evt_type_t type;
 }spvr_msg_t;
 
+typedef enum
+{
+	CALIB_EVT_IDLE,
+	CALIB_EVT_ARMED,
+	CALIB_EVT_MOVING,
+	CALIB_EVT_SAMPLING,
+	CALIB_EVT_SAVING,
+	CALIB_EVT_DONE,
+	CALIB_EVT_COUNT,
+}calib_evt_type_t;
+
+typedef struct
+{
+	calib_evt_type_t type;
+	bool			 pressed;
+}calib_msg_t;
+
 extern osMessageQueueId_t ui_queue;
 extern osMessageQueueId_t ctrl_queue;
 extern osMessageQueueId_t rx_queue;
 extern osMessageQueueId_t spvr_queue;
 extern osMessageQueueId_t stby_queue;
+extern osMessageQueueId_t calib_queue;
 
 #endif /* IPC_MSG_TYPES_H_ */

@@ -23,6 +23,7 @@
 /* COLOR_BLACK 스킵 — 나머지만 순환 */
 static const color_t breath_seq[] =
 {
+	COLOR_GRAY,
     COLOR_RED,
     COLOR_ORANGE,
     COLOR_YELLOW,
@@ -33,7 +34,6 @@ static const color_t breath_seq[] =
     COLOR_SKY_BLUE,
     COLOR_PINK,
     COLOR_WHITE,
-    COLOR_GRAY,
 };
 #define SEQ_COUNT   (sizeof(breath_seq) / sizeof(breath_seq[0]))
 
@@ -42,6 +42,7 @@ static color_t s_target_color = COLOR_BLACK;
 static uint32_t s_tick_acc = 0;
 static uint32_t s_step = 0;
 static bool s_fx_include_gpio = false; // 일반 LED 동기화 여부 플래그
+static uint32_t s_seq_idx = 0;
 
 /* ── 감마 보정 LUT (8-bit → 8-bit, perceived brightness) ─────
  *  없어도 되지만 있으면 훨씬 자연스럽게 숨쉬는 느낌
@@ -83,6 +84,16 @@ void rgb_effect_start(rgb_fx_mode_t mode, color_t target_color)
     s_fx_mode = mode; // 모드를 변경하는 순간 ISR에서 연출 시작
 }
 
+// 진행 중인 효과 즉시 중단 + RGB 소등 (반복 모드 종료용)
+void rgb_effect_stop(void)
+{
+    s_fx_mode = RGB_FX_NONE;
+    s_fx_include_gpio = false;
+    s_tick_acc = 0;
+    s_step = 0;
+    rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+}
+
 void rgb_effect_tick(void)
 {
     if (s_fx_mode == RGB_FX_NONE) return;
@@ -108,6 +119,14 @@ void rgb_effect_tick(void)
             divider = 10;
             break;
 
+        case RGB_FX_BREATH_LOOP:
+            // 캘리브레이션 대기 호흡: 차분한 속도로 계속 반복 (stop 호출 전까지)
+            divider = 50;
+            break;
+        case RGB_FX_BREATH_CYCLE:
+			// 캘리브레이션 대기 호흡: 차분한 속도로 계속 반복 (stop 호출 전까지)
+			divider = 50;
+			break;
         default:
             return;
     }
@@ -152,6 +171,20 @@ void rgb_effect_tick(void)
     /* 스텝 진행 및 자동 종료 제어 */
     if (++s_step >= 512)
     {
+        /* 반복 모드: 종료하지 않고 처음으로 되감아 계속 호흡 */
+    	if (s_fx_mode == RGB_FX_BREATH_LOOP)
+    	{
+    	    s_step = 0;
+    	    return;
+    	}
+    	if (s_fx_mode == RGB_FX_BREATH_CYCLE)
+    	{
+    	    s_step = 0;
+    	    s_seq_idx = (s_seq_idx + 1) % SEQ_COUNT;  // 정적 인덱스 하나 추가
+    	    s_target_color = breath_seq[s_seq_idx];
+    	    return;
+    	}
+
         if (s_fx_include_gpio)
         {
             if (s_fx_mode == RGB_FX_BOOT_BREATH)

@@ -70,6 +70,9 @@ void ui_task(void *argument)
 			case UI_EVT_BOOT_ENTERED:
 				ui_feedback_boot_on();
 				break;
+			case UI_EVT_CALIB_ARMED:
+				ui_feedback_calib_on();
+				break;
 			default:
 				break;
 		}

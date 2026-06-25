@@ -110,7 +110,6 @@ void ui_feedback_disable(void)
 	buzzer_play_space_exit();
 	rgb_effect_enable_gpio_sync(true);
 	rgb_effect_start(RGB_FX_SHUTDOWN_FADE, COLOR_WHITE);
-//	osDelay(1300);
 }
 
 void ui_feedback_power_on(void)
@@ -119,13 +118,18 @@ void ui_feedback_power_on(void)
 
 	rgb_effect_enable_gpio_sync(true);
 	rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_WHITE);
-//	rgb_effect_start(RGB_FX_SHUTDOWN_FADE, COLOR_WHITE);
 
 	osDelay(1300);
 }
 
 void ui_feedback_boot_on(void)
 {
+	rgb_effect_start(RGB_FX_BOOT_BREATH, COLOR_SKY_BLUE);
 	buzzer_play_bootloader_blackhole();
 }
 
+void ui_feedback_calib_on(void)
+{
+	rgb_effect_start(RGB_FX_BREATH_LOOP, COLOR_LIGHT_GREEN);
+	buzzer_play_calib_enter_v3();
+}
