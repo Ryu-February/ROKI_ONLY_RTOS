@@ -63,6 +63,35 @@ static void load_side(uint8_t side, reference_entry_t *tbl)
         }
         tbl[i] = e;
     }
+
+	// 좌/우 구분을 위한 문자열 생성
+//	    char side_char = (side == BH1749_ADDR_LEFT) ? 'L' : 'R';
+//
+//	    uart_printf("=== [Color Table Load] Side: %c ===\r\n", side_char);
+//
+//	    for (int i = 0; i < COLOR_COUNT; i++)
+//	    {
+//	        reference_entry_t e = flash_read_color_reference(side, (uint8_t)i);
+//	        char source_str[16];
+//
+//	        if (!entry_is_valid(&e))
+//	        {
+//	            e.raw    = default_raw[i];
+//	            e.color  = (color_t)i;
+//	            e.offset = 0;
+//	            strcpy(source_str, "DEFAULT"); // flash에 데이터가 없어 컴파일 기본값 사용
+//	        }
+//	        else
+//	        {
+//	            strcpy(source_str, "FLASH");   // 캘리브레이션된 flash 데이터 사용
+//	        }
+//	        tbl[i] = e;
+//
+//	        // 각 색상별 Index, 소스(FLASH/DEFAULT), R, G, B 값 출력
+//	        uart_printf("  [%c] ColorIdx %2d (%s) -> R: %4u, G: %4u, B: %4u\r\n",
+//	                    side_char, i, source_str, e.raw.red_raw, e.raw.green_raw, e.raw.blue_raw);
+//	    }
+//	    uart_printf("===================================\r\n");
 }
 
 void color_sense_load_references(void)

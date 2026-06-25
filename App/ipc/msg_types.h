@@ -11,6 +11,7 @@
 
 #include "btn.h"
 #include "card_cmd.h"
+#include "rgb.h"
 
 typedef enum
 {
@@ -24,6 +25,9 @@ typedef enum
 	UI_EVT_BOOT_ENTERED,
 	UI_EVT_CALIB_ARMED,
 	UI_EVT_CALIB_MOVING,
+	UI_EVT_CALIB_START,		// 시작 알림음
+	UI_EVT_CALIB_SHOW_COLOR,	// 현재 캘리브 중인 색 표시 (calib_color)
+	UI_EVT_CALIB_DONE,		// 완료음 + 소등
 	UI_EVT_COUNT
 }ui_evt_type_t;
 
@@ -37,6 +41,7 @@ typedef struct
 	color_mode_t	card;		// UI_EVT_CARD_INSERTED 시 확정된 명령
 	uint8_t			card_count;	// 누적 카드 개수
 	bool			stby_entered;
+	color_t			calib_color;	// UI_EVT_CALIB_SHOW_COLOR 시 표시할 색
 }ui_msg_t;
 
 typedef enum
@@ -57,9 +62,17 @@ typedef struct
 
 
 
+typedef enum
+{
+	CTRL_CMD_OBSTACLE = 0,	// 기존 IR 알림 (기본값 0)
+	CTRL_CMD_CALIB_MOVE,	// calib: steps만큼 전진 후 calib_queue로 완료 보고
+}ctrl_cmd_t;
+
 typedef struct
 {
+	ctrl_cmd_t		cmd;
 	bool			ir_detected;
+	uint32_t		steps;		// CTRL_CMD_CALIB_MOVE: 전진 스텝 수
 }ctrl_msg_t;
 
 typedef enum
@@ -80,19 +93,14 @@ typedef struct
 
 typedef enum
 {
-	CALIB_EVT_IDLE,
-	CALIB_EVT_ARMED,
-	CALIB_EVT_MOVING,
-	CALIB_EVT_SAMPLING,
-	CALIB_EVT_SAVING,
-	CALIB_EVT_DONE,
-	CALIB_EVT_COUNT,
-}calib_evt_type_t;
+	CALIB_CMD_ARM = 0,		// input: 롱프레스 -> 모드 진입
+	CALIB_CMD_START,		// input: 진입 후 버튼 -> 시작
+	CALIB_EVT_MOVE_DONE,	// control: 이동 완료 보고
+}calib_evt_t;
 
 typedef struct
 {
-	calib_evt_type_t type;
-	bool			 pressed;
+	calib_evt_t		evt;
 }calib_msg_t;
 
 extern osMessageQueueId_t ui_queue;

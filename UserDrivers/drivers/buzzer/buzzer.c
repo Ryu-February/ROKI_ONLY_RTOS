@@ -533,10 +533,12 @@ void buzzer_play_calib_done(void)
 
     // 밝은 장조 느낌: 1.05k → 1.32k → 1.65k 짧게 올리고
     // 마지막 2.1kHz를 약간 길게 “완료!” (총 ~470 ms)
-    (void)buzzer_tone_pattern(1050, 60, 20, 1, 50);
-    (void)buzzer_tone_pattern(1320, 60, 20, 1, 50);
-    (void)buzzer_tone_pattern(1650, 70, 20, 1, 50);
-    (void)buzzer_tone_pattern(2100, 160, 0, 1, 50);
+    (void)buzzer_tone_pattern(1000, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1400, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1800, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1600, 40, 10, 1, 35);
+
+    (void)buzzer_tone_pattern(2000, 150, 0, 1, 20);
 }
 
 void buzzer_play_calib_done_soft(void)
@@ -565,13 +567,13 @@ void buzzer_play_buffer_full_bonk(void)
 // === 2) START/RESTART: 타-타-타아 (~380 ms), 조금 더 힘있게 ===
 void buzzer_play_calib_start_go(void)
 {
-    // 아주 부드럽게 (900 → 1150 → 1400 Hz), 더 낮은 duty
-    (void)buzzer_tone_pattern( 900, 45, 20, 1, 26);
-    (void)buzzer_tone_pattern(1150, 45, 20, 1, 26);
-    (void)buzzer_tone_pattern(1400, 95,  0, 1, 24);
+    buzzer_stop();
 
-    // 미세 무음으로 마감
-    (void)buzzer_tone_pattern(900, 0, 10, 1, 14);
+    (void)buzzer_tone_pattern(1250, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1650, 40, 10, 1, 35);
+    (void)buzzer_tone_pattern(1450, 40, 10, 1, 35);
+
+    (void)buzzer_tone_pattern(1900, 100, 0, 1, 20);
 }
 
 void buzzer_play_jig_mode(void)

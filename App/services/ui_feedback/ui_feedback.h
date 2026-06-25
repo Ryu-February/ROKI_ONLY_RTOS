@@ -11,6 +11,7 @@
 
 #include "btn.h"
 #include "card_cmd.h"
+#include "rgb.h"
 
 void ui_feedback_init(void);
 
@@ -27,4 +28,7 @@ void ui_feedback_power_on(void);
 
 void ui_feedback_boot_on(void);
 void ui_feedback_calib_on(void);
+void ui_feedback_calib_start(void);
+void ui_feedback_calib_show_color(color_t color);
+void ui_feedback_calib_done(void);
 #endif /* SERVICES_UI_FEEDBACK_UI_FEEDBACK_H_ */

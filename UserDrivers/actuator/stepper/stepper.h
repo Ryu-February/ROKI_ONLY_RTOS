@@ -122,6 +122,11 @@ bool step_is_running(void);
 
 void step_drive(StepOperation op);
 
+/* steps 만큼 전진 후 ISR에서 자동 정지. 완료 시 step_on_move_done() 호출 */
+void step_move_steps(uint32_t steps);
+/* 목표 스텝 도달 완료 콜백 (ISR 컨텍스트). 필요한 태스크에서 override */
+void step_on_move_done(void);
+
 /* telemetry */
 uint32_t get_executed_steps(void);
 void show_executed_steps(void);

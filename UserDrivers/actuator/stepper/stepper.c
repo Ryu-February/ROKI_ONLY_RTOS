@@ -85,6 +85,13 @@ static stepper_motor_t right =
 static volatile drv_state_t g_state = DRV_COAST;
 static volatile uint8_t     s_pwm_forced = 1;   /* 1: OCMODE FORCED, 0: PWM1 */
 
+/* ---- target-step auto stop ---- */
+static volatile bool     s_move_active = false;
+static volatile uint32_t s_move_target = 0;   /* get_executed_steps() 기준 정지 목표 */
+
+/* 목표 스텝 도달 시 ISR에서 호출되는 약한 훅 (필요한 태스크에서 override) */
+__attribute__((weak)) void step_on_move_done(void) {}
+
 /* idx-save bookkeeping */
 static volatile uint8_t s_idx_save_pending = 0;
 static uint16_t s_last_saved_l = 0xFFFF, s_last_saved_r = 0xFFFF;
@@ -225,6 +232,18 @@ void step_tick_isr(void)
 
     apply_step(&left);
     apply_step(&right);
+
+    /* 목표 스텝 도달 시 자동 정지 + 완료 통보 */
+    if (s_move_active)
+    {
+        uint32_t cur = (left.odometry_steps + right.odometry_steps) >> 1;
+        if (cur >= s_move_target)
+        {
+            s_move_active = false;
+            step_brake();
+            step_on_move_done();
+        }
+    }
 }
 
 /* ================= control ================= */
@@ -272,8 +291,20 @@ void step_stop(void)        { step_brake(); }
 void step_coast_stop(void)  { step_coast(); }
 bool step_is_running(void)  { return g_state == DRV_RUN; }
 
+/* steps 만큼 전진 후 ISR에서 자동 정지 (완료 시 step_on_move_done 호출) */
+void step_move_steps(uint32_t steps)
+{
+    uint32_t start = get_executed_steps();
+    s_move_target  = start + steps;
+    s_move_active  = true;
+    step_set_dir(+1, +1);
+    step_run();
+}
+
 void step_drive(StepOperation op)
 {
+    if (op == OP_STOP || op == OP_NONE) s_move_active = false;  /* 수동 정지 시 목표 해제 */
+
     switch (op)
     {
         case OP_FORWARD:    step_set_dir(+1, +1); step_run();  break;

@@ -102,9 +102,6 @@ void supervisor_task(void *argument)
 					break;
 			}
 		}
-		/* 부트로더 진입 콤보(delete+execute+resume 2s 홀드).
-		   tim6_get_ms() 타임스탬프 기반이라 폴링 주기와 무관. */
-//		bootloader_combo_tick();
 
 		tick += SUPERVISOR_POLL_MS;
 		sleep_until(tick);

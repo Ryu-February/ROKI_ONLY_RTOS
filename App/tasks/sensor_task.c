@@ -28,6 +28,13 @@
 
 static color_sense_t s_color;		//카드 명령 누적 상태
 
+static volatile bool s_color_paused = false;	//캘리브레이션 중 color 폴링 정지
+
+void sensor_color_pause(bool on)
+{
+	s_color_paused = on;
+}
+
 
 
 static void sensor_dispatch(const sensor_evt_t *e)
@@ -171,7 +178,8 @@ void sensor_task(void *argument)
 		if (++color_div > COLOR_EVAL_DIV)	//40ms
 		{
 			color_div = 0;
-			publish_color();
+			if (!s_color_paused)			//캘리브레이션 중엔 calib_task가 I2C 단독 사용
+				publish_color();
 		}
 
 		tick += 20;

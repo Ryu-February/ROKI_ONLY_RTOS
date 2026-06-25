@@ -11,5 +11,6 @@
 
 /* 블로킹 송신. 반환 true = 성공 */
 bool uart3_send(const uint8_t *buf, uint16_t len);
+void uart_printf(const char *fmt, ...);
 
 #endif /* BSP_UART_UART_H_ */

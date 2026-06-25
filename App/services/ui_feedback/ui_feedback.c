@@ -133,3 +133,20 @@ void ui_feedback_calib_on(void)
 	rgb_effect_start(RGB_FX_BREATH_LOOP, COLOR_LIGHT_GREEN);
 	buzzer_play_calib_enter_v3();
 }
+
+void ui_feedback_calib_start(void)
+{
+	buzzer_play_calib_start_go();
+}
+
+void ui_feedback_calib_show_color(color_t color)
+{
+//	rgb_effect_stop();							// 호흡 효과 끄고 단색 표시 모드
+	rgb_effect_start(RGB_FX_BOOT_BREATH, color);
+}
+
+void ui_feedback_calib_done(void)
+{
+	rgb_set_color(RGB_ZONE_V_SHAPE, COLOR_BLACK);
+	buzzer_play_calib_done();
+}

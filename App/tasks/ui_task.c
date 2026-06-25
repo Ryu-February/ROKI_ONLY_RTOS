@@ -73,6 +73,15 @@ void ui_task(void *argument)
 			case UI_EVT_CALIB_ARMED:
 				ui_feedback_calib_on();
 				break;
+			case UI_EVT_CALIB_START:
+				ui_feedback_calib_start();
+				break;
+			case UI_EVT_CALIB_SHOW_COLOR:
+				ui_feedback_calib_show_color(msg.calib_color);
+				break;
+			case UI_EVT_CALIB_DONE:
+				ui_feedback_calib_done();
+				break;
 			default:
 				break;
 		}
