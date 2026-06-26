@@ -8,6 +8,7 @@
 
 #include "color_sense.h"
 #include "flash.h"
+#include "uart.h"
 
 
 /* --------- 분류 임계값 (튜닝 파라미터) --------- */
@@ -234,10 +235,10 @@ color_t classify_color(uint8_t left_right, uint16_t r, uint16_t g, uint16_t b, u
         if (ratio > ratio_thresh || relmag < REJ_REL_MIN)
         {
             // 애매한 경우에만 밝기/채도 게이트 적용해 보수적으로 GRAY 처리
-//        	if (L < ((mode_sw_get() == MODE_CARD) ? REJ_L_MIN_CARD : REJ_L_MIN_LINE) || (float)(maxc - minc) < REJ_CHROMA_REL_MIN * (float)L)
-//            {
+        	if (L < (REJ_L_MIN_LINE || (float)(maxc - minc) < REJ_CHROMA_REL_MIN * (float)L))
+            {
                 return COLOR_GRAY;
-//            }
+            }
         }
     }
 
@@ -255,6 +256,33 @@ color_mode_t color_to_mode(color_t color)
         case COLOR_PURPLE:		return MODE_REPEAT_ONCE;
         case COLOR_PINK:		return MODE_REPEAT_TWICE;
         case COLOR_SKY_BLUE:	return MODE_REPEAT_THIRD;
+        case COLOR_ORANGE:		return MODE_REPEAT_FOURTH;
         default:                return MODE_NONE;
     }
+}
+
+const char* color_to_string(color_t color)
+{
+    static const char* color_names[] =
+    {
+		"GRAY",
+        "RED",
+        "ORANGE",
+        "YELLOW",
+        "GREEN",
+        "BLUE",
+        "PURPLE",
+        "LIGHT_GREEN",
+        "SKY_BLUE",
+        "PINK",
+        "BLACK",
+        "WHITE",
+    };
+
+    if (color < 0 || color >= COLOR_COUNT)
+    {
+        return "UNKNOWN";
+    }
+
+    return color_names[color];
 }

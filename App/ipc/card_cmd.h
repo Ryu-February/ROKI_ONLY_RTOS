@@ -23,6 +23,7 @@ typedef enum
     MODE_REPEAT_ONCE,
     MODE_REPEAT_TWICE,
     MODE_REPEAT_THIRD,
+	MODE_REPEAT_FOURTH,
     COLOR_MODE_COUNT
 } color_mode_t;
 

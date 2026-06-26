@@ -150,7 +150,6 @@ static void publish_ir(void)
 
 static void publish_color(void)
 {
-
 	sensor_msg_t msg;
 	if (osMessageQueueGet(sensor_queue, &msg, 0, 0) == osOK)
 	{

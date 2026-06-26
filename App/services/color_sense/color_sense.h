@@ -48,6 +48,6 @@ void         color_sense_load_references(void);
 color_t      classify_color(uint8_t left_right, uint16_t r, uint16_t g, uint16_t b, uint16_t ir);
 uint8_t      classify_color_side(uint8_t color_side);
 color_mode_t color_to_mode(color_t color);
-
+const char* color_to_string(color_t color);
 
 #endif /* SERVICES_COLOR_SENSE_COLOR_SENSE_H_ */

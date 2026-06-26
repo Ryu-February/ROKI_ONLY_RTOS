@@ -899,3 +899,36 @@ void buzzer_play_calib_enter_v3(void)
 
     (void)buzzer_tone_pattern(1650, 120, 0, 1, 25);
 }
+
+void buzzer_play_card_input(void)
+{
+    buzzer_stop();
+
+//	  1번
+//    (void)buzzer_tone_pattern(1100, 35, 10, 1, 35);
+//    (void)buzzer_tone_pattern(1550, 80,  0, 1, 30);
+
+    //2번
+//    (void)buzzer_tone_pattern(1000, 25, 5, 1, 35);
+//    (void)buzzer_tone_pattern(1300, 25, 5, 1, 35);
+//    (void)buzzer_tone_pattern(1700, 50, 0, 1, 30);
+
+    (void)buzzer_tone_pattern(1100, 30, 8, 1, 35);
+    (void)buzzer_tone_pattern(1450, 30, 8, 1, 35);
+    (void)buzzer_tone_pattern(1800, 70, 0, 1, 28);
+}
+
+void buzzer_play_button_input(void)
+{
+    buzzer_stop();
+
+//	  1번
+//    (void)buzzer_tone_pattern(1100, 35, 10, 1, 35);
+//    (void)buzzer_tone_pattern(1550, 80,  0, 1, 30);
+
+    //2번
+    (void)buzzer_tone_pattern(1000, 25, 5, 1, 35);
+    (void)buzzer_tone_pattern(1300, 25, 5, 1, 35);
+    (void)buzzer_tone_pattern(1700, 50, 0, 1, 30);
+}
+

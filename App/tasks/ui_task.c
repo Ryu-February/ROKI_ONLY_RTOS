@@ -62,7 +62,7 @@ void ui_task(void *argument)
 				ui_feedback_on_obstacle(sensor_state_get_ir());
 				break;
 			case UI_EVT_CARD_INSERTED:
-				ui_feedback_indicate_card(sensor_state_get_card());
+				ui_feedback_indicate_card(sensor_state_get_color());
 				break;
 			case UI_EVT_STBY_ENTERED:
 				ui_feedback_disable();

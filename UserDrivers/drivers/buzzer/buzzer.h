@@ -149,5 +149,7 @@ void buzzer_play_cosmic_shutdown_low(void);
 void buzzer_play_bootloader_blackhole(void);
 
 void buzzer_play_calib_enter_v3(void);
+void buzzer_play_card_input(void);
+void buzzer_play_button_input(void);
 
 #endif /* BUZZER_BUZZER_H_ */
