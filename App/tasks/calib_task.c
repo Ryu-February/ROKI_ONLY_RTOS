@@ -63,24 +63,6 @@ static void request_move_and_wait(uint32_t steps)
 	} while (m.evt != CALIB_EVT_MOVE_DONE);
 }
 
-/* 한 센서(addr)에서 N회 읽어 평균 raw 산출 (calib가 데이터 수집의 주체) */
-static void sample_side(uint8_t addr, rgb_raw_t *out)
-{
-	uint32_t r = 0, g = 0, b = 0;
-
-	for (uint32_t i = 0; i < CALIB_SAMPLE_COUNT; i++)
-	{
-		bh1749_color_data_t c = bh1749_read_rgbir(addr);
-		r += c.red;
-		g += c.green;
-		b += c.blue;
-		osDelay(CALIB_SAMPLE_GAP_MS);
-	}
-
-	out->red_raw   = (uint16_t)(r / CALIB_SAMPLE_COUNT);
-	out->green_raw = (uint16_t)(g / CALIB_SAMPLE_COUNT);
-	out->blue_raw  = (uint16_t)(b / CALIB_SAMPLE_COUNT);
-}
 
 /* 수집한 좌/우 버퍼를 flash에 한꺼번에 저장 후 RAM 기준테이블 재로드 */
 static void save_all(void)
@@ -101,6 +83,25 @@ static void save_all(void)
 	color_sense_load_references();
 }
 
+/* 한 센서(addr)에서 N회 읽어 평균 raw 산출 (calib가 데이터 수집의 주체) */
+static void request_color_sensor(color_t index)
+{
+	sensor_msg_t msg = { .cmd = SENSOR_CMD_CALIB_SAMPLE };
+	osMessageQueuePut(sensor_queue, &msg, 0, 0);
+
+	calib_msg_t m;
+	do
+	{
+		if (osMessageQueueGet(calib_queue, &m, NULL, osWaitForever) != osOK)
+		{
+			continue;
+		}
+	} while (m.evt != CALIB_EVT_SAMPLE_DONE);
+
+	s_buf_left[index] = m.left;
+	s_buf_right[index] = m.right;
+}
+
 /* 캘리브레이션 본 시퀀스: calib는 "조율"만 하고 실제 동작은 각 태스크가 수행 */
 static void run_sequence(void)
 {
@@ -114,8 +115,7 @@ static void run_sequence(void)
 
 		/* 정지 안정화 후 좌/우 센서 샘플 수집 */
 //		osDelay(CALIB_SETTLE_MS);
-		sample_side(BH1749_ADDR_LEFT,  &s_buf_left[i]);
-		sample_side(BH1749_ADDR_RIGHT, &s_buf_right[i]);
+		request_color_sensor((color_t)i);
 
 		/* control_task: 740스텝 전진 -> 완료 회신 대기 */
 		if (i != COLOR_WHITE)

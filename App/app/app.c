@@ -29,6 +29,7 @@ osMessageQueueId_t ctrl_queue;
 osMessageQueueId_t rx_queue;
 osMessageQueueId_t spvr_queue;
 osMessageQueueId_t calib_queue;
+osMessageQueueId_t sensor_queue;
 
 void app_init(void)
 {
@@ -37,6 +38,7 @@ void app_init(void)
 	rx_queue = osMessageQueueNew(256, sizeof(uint8_t), NULL);	/* PC 프로토콜 RX 바이트 스트림 */
 	spvr_queue = osMessageQueueNew(8, sizeof(spvr_msg_t), NULL);
 	calib_queue = osMessageQueueNew(8, sizeof(calib_msg_t), NULL);
+	sensor_queue = osMessageQueueNew(4, sizeof(sensor_msg_t), NULL);
 
 	for (uint32_t i = 0; i < NUM_STACKS; i++)
 	{

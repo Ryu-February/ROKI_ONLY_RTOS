@@ -12,6 +12,7 @@
 #include "btn.h"
 #include "card_cmd.h"
 #include "rgb.h"
+#include "color.h"		// rgb_raw_t
 
 typedef enum
 {
@@ -96,12 +97,25 @@ typedef enum
 	CALIB_CMD_ARM = 0,		// input: 롱프레스 -> 모드 진입
 	CALIB_CMD_START,		// input: 진입 후 버튼 -> 시작
 	CALIB_EVT_MOVE_DONE,	// control: 이동 완료 보고
+	CALIB_EVT_SAMPLE_DONE,	// sensor: 샘플(좌/우 평균 raw) 회신
 }calib_evt_t;
 
 typedef struct
 {
 	calib_evt_t		evt;
+	rgb_raw_t		left;	// CALIB_EVT_SAMPLE_DONE: 좌 센서 평균 raw
+	rgb_raw_t		right;	// CALIB_EVT_SAMPLE_DONE: 우 센서 평균 raw
 }calib_msg_t;
+
+typedef enum
+{
+	SENSOR_CMD_CALIB_SAMPLE = 0,	// 좌/우 N회 평균 읽어 calib_queue로 회신
+}sensor_cmd_t;
+
+typedef struct
+{
+	sensor_cmd_t	cmd;
+}sensor_msg_t;
 
 extern osMessageQueueId_t ui_queue;
 extern osMessageQueueId_t ctrl_queue;
@@ -109,5 +123,6 @@ extern osMessageQueueId_t rx_queue;
 extern osMessageQueueId_t spvr_queue;
 extern osMessageQueueId_t stby_queue;
 extern osMessageQueueId_t calib_queue;
+extern osMessageQueueId_t sensor_queue;
 
 #endif /* IPC_MSG_TYPES_H_ */
